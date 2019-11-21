@@ -443,11 +443,13 @@ public class UtilMethodsFactory {
 							if (entry.getKey().equals(entry1.getKey()[x][y])) {
 								propertiesTabbedPane.addTableInfoPane(entry1.getKey()[x], entry1.getValue()[x], ((CustomAWSObject) nodeObject).getTableTabHeaders(entry.getKey()), ((CustomAWSObject) nodeObject).getTableTabToolTips(entry.getKey()),
 										((CustomAWSObject) nodeObject).getAssociatedImage(), n, ((CustomAWSObject) nodeObject).getkeyEvents().get(n));
+								
 							}
 							y++;
 						}
 						x++;
 					}
+					
 				}
 				propertiesTabbedPane.addResizableTabsHeights(10);
 				propertiesTabbedPane.addrResizableTabsIndex(n);

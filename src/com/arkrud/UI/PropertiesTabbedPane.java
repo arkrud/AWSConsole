@@ -156,7 +156,7 @@ public class PropertiesTabbedPane extends JPanel {
 		tabbedPane.addTab(paneTitle, icon, docPanel, paneTip);
 		tabbedPane.setMnemonicAt(tabIndex, mnemonic);
 	}
-
+	
 	public void setPaneSelection(int index) {
 		tabbedPane.setSelectedIndex(index);
 	}
