@@ -30,7 +30,7 @@ public class CustomEC2KeyPair extends KeyPairInfo implements CustomAWSObject {
 	private KeyPairInfo keyPairInfo;
 	private AWSAccount account;
 	private String[] keyPairsTableColumnHeaders = { "Key pair name", "Fingerprint" };
-	private String action = "Delete";
+	private String action = "Import";
 	private String objectNickName = "KeyPair";
 
 	public CustomEC2KeyPair(KeyPairInfo keyPairInfo) {
@@ -268,4 +268,9 @@ public class CustomEC2KeyPair extends KeyPairInfo implements CustomAWSObject {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	private void importKeyIntoApp () {
+		
+	}
+	
 }

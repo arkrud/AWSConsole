@@ -92,6 +92,7 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 				UtilMethodsFactory.addInternalFrameToScrolableDesctopPane(frameTitle, pane, theFrame);
 			} else if (table.getModel().getValueAt(mRowIndex, vColIndex).getClass().toString().contains("Stack")) {
 			}
+			showPopup(e);
 		} else {
 			if (vColIndex == -1) {
 				return;
@@ -106,6 +107,7 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 	 * @param e
 	 */
 	private void showPopup(MouseEvent e) {
+		System.out.println("!!!!!!!!!!!!!!!!!!!");
 		table = (CustomTable) e.getSource();
 		if (e.isPopupTrigger()) {
 			if (table.getSelectedRow() == table.rowAtPoint(e.getPoint())) {
@@ -113,6 +115,8 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 				int realColumnIndex = table.convertColumnIndexToModel(table.columnAtPoint(e.getPoint()));
 				int realRowIndex = table.convertRowIndexToModel(table.rowAtPoint(e.getPoint()));
 				Object cellValue = table.getModel().getValueAt(realRowIndex, realColumnIndex);
+				String columnName = table.getModel().getColumnName(realColumnIndex);
+				System.out.println("columnName: " + columnName);
 				int selectedRowsCount = table.getSelectedRowCount();
 				if (cellValue instanceof AWSAccount) {
 					String[] menus = { "Delete AWS Account" };
@@ -135,13 +139,14 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 					if (!str.contentEquals("")) {
 						addMenuItems(menus);
 					}
-				} else if (cellValue instanceof Integer && table.getableUsageIdentifier().equals("ELBListeners")) {
-					String[] menus = { "Open Endpoint" };
-					addMenuItems(menus);
-				} else if (table.getableUsageIdentifier().equals("Applications")) {
-					String[] menus = { "Remove Application Tree" };
-					addMenuItems(menus);
-				} else {
+				} else if (cellValue instanceof Integer) {
+					if (columnName.contains("Load Balancer Port")) {
+						System.out.println("cellClass: " + cellValue.getClass().getSimpleName());
+						String[] menus = { "Open Endpoint" };
+						addMenuItems(menus);
+					}
+				} else if (cellValue instanceof LinkLikeButton) {
+					System.out.println("cellClass: " + cellValue.getClass().getSimpleName());
 					customAWSObject = ((LinkLikeButton) table.getModel().getValueAt(mRowIndex, vColIndex)).getCustomAWSObject();
 					customAWSObject.setAccount(awsAccount);
 					if (selectedRowsCount > 1) {
@@ -149,6 +154,8 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 					} else {
 						addMenuItems(customAWSObject.defineTableSingleSelectionDropDown());
 					}
+				} else {
+					System.out.println("cellClass: " + cellValue.getClass().getSimpleName());
 				}
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
@@ -174,12 +181,10 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 		if (object instanceof S3ObjectSummary) {
 			if (menuText.contains("Delete")) {
 				S3ObjectSummary s3ObjectSummary = (S3ObjectSummary) table.getModel().getValueAt(realRowIndex, 0);
-				int response = JOptionPane.showConfirmDialog(null, "Do you want to delete " + s3ObjectSummary.getKey() + "?", "S3 Object Deletion",
-						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int response = JOptionPane.showConfirmDialog(null, "Do you want to delete " + s3ObjectSummary.getKey() + "?", "S3 Object Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (response == JOptionPane.NO_OPTION) {
 				} else if (response == JOptionPane.YES_OPTION) {
-					S3Common.deletes3Object(S3Common.connectToS3(AwsCommon.getAWSCredentials(table.getS3Folder().getFolderAccount().getAccountAlias())),
-							table.getS3Folder().getBucket().getName(), s3ObjectSummary.getKey());
+					S3Common.deletes3Object(S3Common.connectToS3(AwsCommon.getAWSCredentials(table.getS3Folder().getFolderAccount().getAccountAlias())), table.getS3Folder().getBucket().getName(), s3ObjectSummary.getKey());
 					UtilMethodsFactory.reloadTableModelAfterRowRemoval(table);
 				} else if (response == JOptionPane.CLOSED_OPTION) {
 				}
@@ -267,11 +272,13 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 				removeAWSAccount(account, table.getDash(), table.getParentTreeNode(), table.getTree());
 			}
 		} else if (object instanceof LinkLikeButton) {
-		} else if (object instanceof String) {
+		} else if (object instanceof Integer) {
 			if (menuText.contains("Open Endpoint")) {
 				CustomEC2ELB elb = (CustomEC2ELB) table.getDataObject();
 				UtilMethodsFactory.openURLInBrowser("http://" + elb.getDNSName() + ":" + table.getModel().getValueAt(realRowIndex, 1));
-			} else if (menuText.contains("SHH to Instance")) {
+			}
+		} else if (object instanceof String) {
+			if (menuText.contains("SHH to Instance")) {
 				String id = ((LinkLikeButton) table.getModel().getValueAt(realRowIndex, 0)).getText();
 				AWSAccount account = ((LinkLikeButton) table.getModel().getValueAt(realRowIndex, 0)).getAccount();
 				CustomEC2Instance instance = new CustomEC2Instance(account, id, false, null);
@@ -284,8 +291,7 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 					}
 				} else {
 					if (instance.getPlatform().equals("windows")) {
-						JOptionPane.showMessageDialog(table, "This instance has Windows OS. Please use RDP to connct", "SSH is not Supported for Windows",
-								JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(table, "This instance has Windows OS. Please use RDP to connct", "SSH is not Supported for Windows", JOptionPane.WARNING_MESSAGE);
 					} else {
 						ProcessTask processTask = new ProcessTask("centos", instance.getPrivateIpAddress(), instance.getKeyName());
 						try {
@@ -296,8 +302,7 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 					}
 				}
 			} else if (menuText.contains("Delete Tree")) {
-				int response = JOptionPane.showConfirmDialog(null, "Do you want to remove remove this Applicatin Tree(s)", "Application Tree removal",
-						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int response = JOptionPane.showConfirmDialog(null, "Do you want to remove remove this Applicatin Tree(s)", "Application Tree removal", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (response == JOptionPane.NO_OPTION) {
 				} else if (response == JOptionPane.YES_OPTION) {
 					int[] selection = table.getSelectedRows();
@@ -318,20 +323,18 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 		} else if (object instanceof S3Folder) {
 			if (menuText.contains("Delete")) {
 				S3Folder s3Folder = (S3Folder) table.getModel().getValueAt(realRowIndex, 0);
-				int response = JOptionPane.showConfirmDialog(null, "Do you want to delete " + s3Folder.getFolderName() + "?", "S3 Folder Deletion",
-						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int response = JOptionPane.showConfirmDialog(null, "Do you want to delete " + s3Folder.getFolderName() + "?", "S3 Folder Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (response == JOptionPane.NO_OPTION) {
 				} else if (response == JOptionPane.YES_OPTION) {
-					S3Common.deleteFolderInBacket(S3Common.connectToS3(AwsCommon.getAWSCredentials(s3Folder.getFolderAccount().getAccountAlias())),
-							s3Folder.getBucket().getName(), s3Folder.getFolderPath());
+					S3Common.deleteFolderInBacket(S3Common.connectToS3(AwsCommon.getAWSCredentials(s3Folder.getFolderAccount().getAccountAlias())), s3Folder.getBucket().getName(), s3Folder.getFolderPath());
 					UtilMethodsFactory.reloadTableModelAfterRowRemoval(table);
 				} else if (response == JOptionPane.CLOSED_OPTION) {
 				}
 			}
 		} else {
 			((CustomAWSObject) object).performTableActions(customAWSObject, jScrollableDesktopPan, table, menuText);
-			if (table.getableUsageIdentifier().equals("AddELBListenersSimple") || table.getableUsageIdentifier().equals("AddELBListenersAdvanced")
-					|| table.getableUsageIdentifier().equals("AddTags") || table.getableUsageIdentifier().equals("EditELBTags")) {
+			if (table.getableUsageIdentifier().equals("AddELBListenersSimple") || table.getableUsageIdentifier().equals("AddELBListenersAdvanced") || table.getableUsageIdentifier().equals("AddTags")
+					|| table.getableUsageIdentifier().equals("EditELBTags")) {
 				if (menuText.contains("Delete")) {
 					UtilMethodsFactory.reloadTableModelAfterRowRemoval(table);
 				}
@@ -342,8 +345,7 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 	// Remove AWS account
 	private void removeAWSAccount(AWSAccount account, Dashboard dash, DefaultMutableTreeNode node, JTree tree) {
 		// Show confirmation message
-		int response = JOptionPane.showConfirmDialog(null, "Do you want to remove AWS Account " + account.getAccountAlias() + "?", "AWS Account Removal",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		int response = JOptionPane.showConfirmDialog(null, "Do you want to remove AWS Account " + account.getAccountAlias() + "?", "AWS Account Removal", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (response == JOptionPane.NO_OPTION) {
 		} else if (response == JOptionPane.YES_OPTION) {
 			// Remove account information from INI configuration files

@@ -749,7 +749,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 		return instances;
 	}
 
-	public CustomEC2Instance retriveOneEC2Instance(AWSAccount account,  String id) {
+	public static CustomEC2Instance retriveOneEC2Instance(AWSAccount account,  String id) {
 		DescribeInstancesResult describeInstancesResult = null;
 		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
 

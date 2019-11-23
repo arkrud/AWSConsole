@@ -17,6 +17,8 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -415,11 +417,12 @@ public class UtilMethodsFactory {
 		}
 	}
 
-	public static void showFrame(Object nodeObject, JScrollableDesktopPane jScrollableDesktopPan) {
+	public static CustomTableViewInternalFrame showFrame(Object nodeObject, JScrollableDesktopPane jScrollableDesktopPan) {
 		String frameTitle = ((CustomAWSObject) nodeObject).getpropertiesPaneTitle();
 		PropertiesTabbedPane propertiesTabbedPane = generateEC2ObjectPropertiesPane(nodeObject, jScrollableDesktopPan);
 		CustomTableViewInternalFrame theFrame = new CustomTableViewInternalFrame(frameTitle, propertiesTabbedPane);
 		addInternalFrameToScrolableDesctopPane(frameTitle, jScrollableDesktopPan, theFrame);
+		return theFrame;
 	}
 
 	public static PropertiesTabbedPane generateEC2ObjectPropertiesPane(Object nodeObject, JScrollableDesktopPane jScrollableDesktopPan) {
@@ -626,5 +629,9 @@ public class UtilMethodsFactory {
 			}
 		}
 		return volumeName;
+	}
+	
+	public static void copyFile(File source, File dest) throws IOException {
+		Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	}
 }

@@ -59,7 +59,7 @@ public class DashboardMenu extends JMenu implements ActionListener {
 			showConsoleLoginAccountFrame(addDashboardUser);
 		} else if (menuText.contains("Manage Application Trees")) {
 			HashMap<String, String> applications = new HashMap<String, String>();
-			applications.put("vts", "true");
+			//applications.put("vts", "true");
 			INIFilesFactory.addINIFileSection(UtilMethodsFactory.getConsoleConfig(), "Applications", applications);
 			ArrayList<String> columnHeaders = new ArrayList<String>();
 			columnHeaders.add("Application");

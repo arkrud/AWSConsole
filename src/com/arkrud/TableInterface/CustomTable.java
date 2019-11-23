@@ -115,12 +115,17 @@ public class CustomTable extends JTable {
 		populateModelData(model);
 		// Generate table column header from model
 		model.generateTableHeaders(columnHeaders);
-		model.setDash(dash);
+		if (dataObject instanceof Dashboard) {
+			model.setDash((Dashboard)dataObject);
+		}
+		
 		// Set table to be sortable by clicking on the header
 		myModelSorter = new TableRowSorter<CustomTableModel>(model);
 		setRowSorter(myModelSorter);
 		// Apply model to the table
 		setModel(model);
+	
+		
 		// Configure table interface options
 		setPreferredScrollableViewportSize(getPreferredSize());
 		setFillsViewportHeight(true);
@@ -245,10 +250,7 @@ public class CustomTable extends JTable {
 		} else if (tableUsageIdentifier.equals("ELBInstances")) {
 			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instances"),
 					0);
-			ButtonColumn instanceIDLinkColumn = new ButtonColumn(this,
-					new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Actions"), 4);
 			instanceColumn.setMnemonic(KeyEvent.VK_D);
-			instanceIDLinkColumn.setMnemonic(KeyEvent.VK_E);
 		} else if (tableUsageIdentifier.equals("TargetGroupTargets")) {
 			ButtonColumn instanceColumn = new ButtonColumn(this,
 					new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instance ID"), 1);

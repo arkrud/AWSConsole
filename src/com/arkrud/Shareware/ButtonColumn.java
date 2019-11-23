@@ -64,7 +64,6 @@ public class ButtonColumn extends AbstractCellEditor implements TableCellRendere
 		TableColumnModel columnModel = table.getColumnModel();
 		columnModel.getColumn(column).setCellRenderer(this);
 		columnModel.getColumn(column).setCellEditor(this);
-		System.out.println(table.getColumnCount());
 		table.addMouseListener(this);
 	}
 
@@ -104,7 +103,6 @@ public class ButtonColumn extends AbstractCellEditor implements TableCellRendere
 
 	@Override
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-		System.out.println(value.getClass());
 		if (value == null) {
 			editButton.setText("");
 			editButton.setIcon(null);
@@ -189,14 +187,12 @@ public class ButtonColumn extends AbstractCellEditor implements TableCellRendere
 	 */
 	@Override
 	public void mousePressed(MouseEvent e) {
-		System.out.println("Pressing");
 		if (table.isEditing() && table.getCellEditor() == this)
 			isButtonColumnEditor = true;
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		System.out.println("releasing");
 		if (isButtonColumnEditor && table.isEditing())
 			table.getCellEditor().stopCellEditing();
 		isButtonColumnEditor = false;

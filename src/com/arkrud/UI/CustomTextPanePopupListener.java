@@ -9,16 +9,24 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultEditorKit;
 
+import com.arkrud.aws.AWSAccount;
+import com.arkrud.aws.CustomObjects.CustomEC2Instance;
+
 public class CustomTextPanePopupListener extends MouseAdapter implements ActionListener, PropertyChangeListener {
 	private JPopupMenu popupMenu;
+	private AWSAccount account;
+	private String fieldName;
 
-	public CustomTextPanePopupListener(JPopupMenu popupMenu) {
+	public CustomTextPanePopupListener(JPopupMenu popupMenu, AWSAccount account, String fieldName) {
 		super();
 		this.popupMenu = popupMenu;
+		this.account = account;
+		this.fieldName = fieldName;
 	}
 
 	private void showPopup(MouseEvent e) {
@@ -32,6 +40,20 @@ public class CustomTextPanePopupListener extends MouseAdapter implements ActionL
 			menuItem.setText("Copy");
 			menuItem.addActionListener(this);
 			popupMenu.add(menuItem);
+			if (fieldName.contains("Instance ID")) {
+				CustomEC2Instance instance = CustomEC2Instance.retriveOneEC2Instance(account, textPane.getText());
+				Action shhAction = new SHHAction(instance, textPane);
+				JMenuItem shhMenuItem = new JMenuItem(shhAction);
+				shhMenuItem.setText("SHH In");
+				shhMenuItem.addActionListener(this);
+				popupMenu.add(shhMenuItem);
+			} else if (fieldName.contains("Key Name")) {
+				Action keyImportAction = new KeyImportAction(textPane);
+				JMenuItem keyImportItem = new JMenuItem(keyImportAction);
+				keyImportItem.setText("Import Key");
+				keyImportItem.addActionListener(this);
+				popupMenu.add(keyImportItem);
+			} 
 			popupMenu.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}

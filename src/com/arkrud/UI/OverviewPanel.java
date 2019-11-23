@@ -43,10 +43,12 @@ import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 public class OverviewPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JScrollableDesktopPane jScrollableDesktopPane;
+	private AWSAccount account;
 
 	public OverviewPanel(Object parentPane, AWSAccount account, JScrollableDesktopPane jScrollableDesktopPane, String dataFlag) {
 		this.jScrollableDesktopPane = jScrollableDesktopPane;
 		this.setLayout(new SpringLayout());
+		this.account = account;
 		((CustomAWSObject) parentPane).populateAWSObjectPrpperties(this, (CustomAWSObject) parentPane, dataFlag);
 	}
 
@@ -114,13 +116,14 @@ public class OverviewPanel extends JPanel {
 			} else {
 				boolean justLabel = true;
 				if ((String) property != null) {
-					if (propertyNameLabels[x].getText().contains("IAM Instance Profile") || propertyNameLabels[x].getText().contains("Key Name")) {
+					if (propertyNameLabels[x].getText().contains("IAM Instance Profile") ) {
+						// || propertyNameLabels[x].getText().contains("Key Name")
 						LinkLikeButton linkLikeButton = new LinkLikeButton(property);
 						linkLikeButton.setName("PanelLinkLikeButton");
 						add(linkLikeButton);
 						justLabel = false;
 					} else {
-						addTextFieldPropertyObject(property);
+						addTextFieldPropertyObject(property, propertyNameLabels[x].getText());
 						justLabel = false;
 					}
 				}
@@ -230,9 +233,8 @@ public class OverviewPanel extends JPanel {
 		return buttonPanel;
 	}
 
-	private void addTextFieldPropertyObject(Object property) {
+	private void addTextFieldPropertyObject(Object property, String fieldName) {
 		JTextField tf = new JTextField();
-		// JTextPane jtextPane = new JTextPane();
 		tf.setText((String) property);
 		tf.setEditable(false); // as before
 		tf.setBackground(null); // this is the same as a JLabel
@@ -242,7 +244,7 @@ public class OverviewPanel extends JPanel {
 		tf.setFont(font);
 		tf.setPreferredSize(new Dimension(200, 30));
 		JPopupMenu popup = new JPopupMenu();
-		tf.addMouseListener(new CustomTextPanePopupListener(popup));
+		tf.addMouseListener(new CustomTextPanePopupListener(popup,account,fieldName));
 		add(tf);
 	}
 

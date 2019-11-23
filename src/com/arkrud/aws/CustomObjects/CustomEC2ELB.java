@@ -1,6 +1,8 @@
 package com.arkrud.aws.CustomObjects;
 
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -13,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.amazonaws.AmazonClientException;
@@ -50,6 +53,7 @@ import com.amazonaws.services.elasticloadbalancing.model.SourceSecurityGroup;
 import com.amazonaws.services.elasticloadbalancing.model.TagDescription;
 import com.arkrud.TableInterface.CustomTable;
 import com.arkrud.TreeInterface.CustomTreeContainer;
+import com.arkrud.UI.CustomProgressBar;
 import com.arkrud.UI.LinkLikeButton;
 import com.arkrud.UI.OverviewPanel;
 import com.arkrud.UI.Dashboard.CustomTableViewInternalFrame;
@@ -60,13 +64,13 @@ import com.arkrud.aws.AwsCommon;
 import com.arkrud.aws.StaticFactories.EC2Common;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
-public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSObject {
+public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSObject, PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
 	private AWSAccount account;
 	private LoadBalancerDescription loadBalancerDescription;
 	private String[] elbsTableColumnHeaders = { "ELB Name", "DNS Name", "VPC ID", "Availability Zones", "Type", "Created At", "Port Configuration", "Instance Count", "Health Check" };
-	private String[] elbInstancesTableColumnHeaders = { "Instance ID", "Instance Name", "Availability Zone", "Status", "Actions" };
-	private String[] elbSubnetsTableColumnHeaders = { "Availability Zone", "Subnet ID", "Subnet CIDR", "Instance Count", "Helthy?", "Actions" };
+	private String[] elbInstancesTableColumnHeaders = { "Instance ID", "Instance Name", "Availability Zone", "Status" };
+	private String[] elbSubnetsTableColumnHeaders = { "Availability Zone", "Subnet ID", "Subnet CIDR", "Instance Count", "Helthy?" };
 	private String[] elbListenersTableColumnHeaders = { "Load Balancer Protocol", "Load Balancer Port", "Instance Protocol", "Instance Port", "SSL Certificate" };
 	private String[] securityGroupsTableColumnHeaders = { "Group Name", "GroupID", "Owner", "VPC ID", "Description", "Tags", "Ingress", "Egress" };
 	private JLabel[] elbOverviewHeaderLabels = { new JLabel("ELB Name: "), new JLabel("DNS Name: "), new JLabel("Scheme: "), new JLabel("Instances: "), new JLabel("Subnets: "), new JLabel("Availability Zones: "), new JLabel("Creation time: "),
@@ -317,18 +321,13 @@ public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSOb
 					if (tag.getKey().equals("Name")) {
 						hasName = true;
 						elbInstancedata.add(tag.getValue());
-
 					}
-
 				}
 				if (!hasName) {
 					elbInstancedata.add("Not named");
 				}
-
 				elbInstancedata.add(describeInstancesResult.getReservations().get(0).getInstances().get(0).getPlacement().getAvailabilityZone());
 				elbInstancedata.add(elbInstancesServiceStates.get(x));
-				LinkLikeButton linkLikeButton = new LinkLikeButton("Remove from Load Balancer");
-				elbInstancedata.add(linkLikeButton);
 			} catch (AmazonServiceException e) {
 				e.printStackTrace();
 			} catch (AmazonClientException e) {
@@ -464,8 +463,6 @@ public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSOb
 				} else {
 					elbSubnetData.add("Yes");
 				}
-				LinkLikeButton linkLikeButton = new LinkLikeButton("Remove from Load Balancer");
-				elbSubnetData.add(linkLikeButton);
 			}
 			elbSubnetsData.add(elbSubnetData);
 		}
@@ -478,7 +475,6 @@ public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSOb
 		DescribeTagsRequest describeTagsRequest = new DescribeTagsRequest().withLoadBalancerNames(getLoadBalancerName());
 		client.setRegion(account.getAccontRegionObject());
 		DescribeTagsResult response = client.describeTags(describeTagsRequest);
-
 		Iterator<TagDescription> tagsDercriptionIterator = response.getTagDescriptions().iterator();
 		while (tagsDercriptionIterator.hasNext()) {
 			TagDescription descr = tagsDercriptionIterator.next();
@@ -564,8 +560,8 @@ public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSOb
 	@Override
 	public LinkedHashMap<String[][], String[][][]> getPropertiesPaneTableParams() {
 		LinkedHashMap<String[][], String[][][]> map = new LinkedHashMap<String[][], String[][][]>();
-		String[][] dataFlags0 = { { "ELBInstances" ,  "ELBNetworking" } };
-		String[][][] columnHeaders0 = { { elbInstancesTableColumnHeaders ,  elbSubnetsTableColumnHeaders } };
+		String[][] dataFlags0 = { { "ELBInstances", "ELBNetworking" } };
+		String[][][] columnHeaders0 = { { elbInstancesTableColumnHeaders, elbSubnetsTableColumnHeaders } };
 		map.put(dataFlags0, columnHeaders0);
 		String[][] dataFlags1 = { { "ELBListeners" } };
 		String[][][] columnHeaders1 = { { elbListenersTableColumnHeaders } };
@@ -660,7 +656,25 @@ public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSOb
 		DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
 		setAccount(((CustomTreeContainer) parentNode.getUserObject()).getAccount());
 		if (actionString.equals(objectNickName.toUpperCase() + " PROPERTIES")) {
-			UtilMethodsFactory.showFrame(node.getUserObject(), dash.getJScrollableDesktopPane());
+			final CustomProgressBar progFrame = new CustomProgressBar(true, false, "Retrieving ELB Info");
+			progFrame.getPb().setIndeterminate(true);
+			SwingWorker<Void, Void> w = new SwingWorker<Void, Void>() {
+				@Override
+				protected Void doInBackground() throws Exception {
+					UtilMethodsFactory.showFrame(node.getUserObject(), dash.getJScrollableDesktopPane());
+					return null;
+				};
+
+				// this is called when the SwingWorker's doInBackground finishes
+				@Override
+				protected void done() {
+					progFrame.getPb().setIndeterminate(false);
+					progFrame.setVisible(false); // hide my progress bar JFrame
+				};
+			};
+			w.addPropertyChangeListener(this);
+			w.execute();
+			progFrame.setVisible(true);
 		}
 	}
 
@@ -689,6 +703,7 @@ public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSOb
 			region = Region.getRegion(Regions.US_WEST_2);
 		}
 		elbClient.setRegion(account.getAccontRegionObject());
+		
 		DescribeLoadBalancersResult lbr = elbClient.describeLoadBalancers();
 		Iterator<LoadBalancerDescription> it = lbr.getLoadBalancerDescriptions().iterator();
 		CustomEC2ELB customEC2ELB = null;
@@ -735,5 +750,10 @@ public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSOb
 		} catch (Exception e1) {
 			JOptionPane.showMessageDialog(theFrame, "This " + objectNickName + " is Alredy Deleted", objectNickName + " Gone", JOptionPane.WARNING_MESSAGE);
 		}
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		// TODO Auto-generated method stub
 	}
 }

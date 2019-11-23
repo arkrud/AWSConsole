@@ -1,18 +1,21 @@
 package com.arkrud.TableInterface;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 import com.amazonaws.services.ec2.model.SecurityGroup;
-import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancingv2.model.Listener;
 import com.amazonaws.services.elasticloadbalancingv2.model.Rule;
 import com.arkrud.TreeInterface.CustomTreeContainer;
+import com.arkrud.UI.CustomProgressBar;
 import com.arkrud.UI.LinkLikeButton;
 import com.arkrud.UI.Dashboard.CustomTableViewInternalFrame;
 import com.arkrud.Util.UtilMethodsFactory;
@@ -24,7 +27,7 @@ import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
 import com.tomtessier.scrollabledesktop.BaseInternalFrame;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
-public class CustomTableButtonColumnAction extends AbstractAction {
+public class CustomTableButtonColumnAction extends AbstractAction implements PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
 	private CustomTable table;
 	private JScrollableDesktopPane jScrollableDesktopPan;
@@ -32,9 +35,10 @@ public class CustomTableButtonColumnAction extends AbstractAction {
 	private String buttonColumn;
 	private String frameHeaderPrefix;
 	private String usageFlag;
+	private CustomEC2Instance customEC2Instance;
+	private CustomTableViewInternalFrame theFrame;
 
-	public CustomTableButtonColumnAction(CustomTable table, JScrollableDesktopPane jScrollableDesktopPan, ArrayList<String> columnHeaders, String buttonColumn,
-			String frameHeaderPrefix, String usageFlag) {
+	public CustomTableButtonColumnAction(CustomTable table, JScrollableDesktopPane jScrollableDesktopPan, ArrayList<String> columnHeaders, String buttonColumn, String frameHeaderPrefix, String usageFlag) {
 		super();
 		this.table = table;
 		this.jScrollableDesktopPan = jScrollableDesktopPan;
@@ -42,28 +46,46 @@ public class CustomTableButtonColumnAction extends AbstractAction {
 		this.buttonColumn = buttonColumn;
 		this.frameHeaderPrefix = frameHeaderPrefix;
 		this.usageFlag = usageFlag;
-		}
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (usageFlag.equals("Instances")) {
 			int slecetdRowModelIndex = table.convertRowIndexToModel(table.getSelectedRow());
-			Instance instance = ((CustomEC2ELB) table.getDataObject()).getInstances().get(slecetdRowModelIndex);
-			String instanceID = instance.getInstanceId();
-			CustomEC2Instance customEC2Instance = new CustomEC2Instance(((CustomEC2ELB) table.getDataObject()).getAwsAccount(), instanceID, false, null);
-			UtilMethodsFactory.showFrame(customEC2Instance, jScrollableDesktopPan);
+			final CustomProgressBar progFrame = new CustomProgressBar(true, false, "Retrieving Instance Info");
+			progFrame.getPb().setIndeterminate(true);
+			SwingWorker<Void, Void> w = new SwingWorker<Void, Void>() {
+				@Override
+				protected Void doInBackground() throws Exception {
+					String instanceID = ((CustomEC2ELB) table.getDataObject()).getInstances().get(slecetdRowModelIndex).getInstanceId();
+					customEC2Instance = new CustomEC2Instance(((CustomEC2ELB) table.getDataObject()).getAwsAccount(), instanceID, false, null);
+					theFrame = UtilMethodsFactory.showFrame(customEC2Instance, jScrollableDesktopPan);
+					return null;
+				};
+
+				// this is called when the SwingWorker's doInBackground finishes
+				@Override
+				protected void done() {
+					progFrame.getPb().setIndeterminate(false);
+					progFrame.setVisible(false); // hide my progress bar JFrame
+				};
+			};
+			w.addPropertyChangeListener(this);
+			w.execute();
+			progFrame.setVisible(true);
+			jScrollableDesktopPan.setSelectedFrame(theFrame);
 		} else if (usageFlag.contains("Subnets")) {
 		} else if (usageFlag.equals("Instance ID")) {
 			int realRowIndex = table.convertRowIndexToModel(table.getSelectedRow());
 			int realcolumnIndex = table.convertColumnIndexToModel(table.getSelectedColumn());
-			LinkLikeButton linkLikeButton = (LinkLikeButton)table.getModel().getValueAt(realRowIndex, realcolumnIndex);
-			CustomEC2Instance customEC2Instance = new CustomEC2Instance(((CustomEC2TargetGroup) table.getDataObject()).getAccount(), linkLikeButton.getText() );
+			LinkLikeButton linkLikeButton = (LinkLikeButton) table.getModel().getValueAt(realRowIndex, realcolumnIndex);
+			CustomEC2Instance customEC2Instance = new CustomEC2Instance(((CustomEC2TargetGroup) table.getDataObject()).getAccount(), linkLikeButton.getText());
 			UtilMethodsFactory.showFrame(customEC2Instance, jScrollableDesktopPan);
 		} else if (usageFlag.equals("Target Group")) {
 			int realRowIndex = table.convertRowIndexToModel(table.getSelectedRow());
 			int realcolumnIndex = table.convertColumnIndexToModel(table.getSelectedColumn());
-			LinkLikeButton linkLikeButton = (LinkLikeButton)table.getModel().getValueAt(realRowIndex, realcolumnIndex);
-			CustomEC2TargetGroup customEC2TargetGroup = new CustomEC2TargetGroup(((CustomEC2ELBV2) table.getDataObject()).getAccount(), linkLikeButton.getText() );
+			LinkLikeButton linkLikeButton = (LinkLikeButton) table.getModel().getValueAt(realRowIndex, realcolumnIndex);
+			CustomEC2TargetGroup customEC2TargetGroup = new CustomEC2TargetGroup(((CustomEC2ELBV2) table.getDataObject()).getAccount(), linkLikeButton.getText());
 			UtilMethodsFactory.showFrame(customEC2TargetGroup, jScrollableDesktopPan);
 		} else if (usageFlag.equals("Tags") || usageFlag.equals("Ingress") || usageFlag.equals("Egress")) {
 			// Get table selected row index
@@ -76,8 +98,7 @@ public class CustomTableButtonColumnAction extends AbstractAction {
 			String groupID = (String) table.getModel().getValueAt(slecetdRowModelIndex, idColumnIndex);
 			// Get EC2 SecurityGroup object by group ID
 			@SuppressWarnings("unchecked")
-			Iterator<CustomEC2SecurityGroup> groupsIterator = (Iterator<CustomEC2SecurityGroup>) ((CustomTreeContainer) table.getDataObject()).getEc2Objects()
-					.iterator();
+			Iterator<CustomEC2SecurityGroup> groupsIterator = (Iterator<CustomEC2SecurityGroup>) ((CustomTreeContainer) table.getDataObject()).getEc2Objects().iterator();
 			while (groupsIterator.hasNext()) {
 				CustomEC2SecurityGroup group = groupsIterator.next();
 				if (group.getGroupId().contains(groupID)) {
@@ -160,5 +181,10 @@ public class CustomTableButtonColumnAction extends AbstractAction {
 		} else {
 			return true;
 		}
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent arg0) {
+		// TODO Auto-generated method stub
 	}
 }

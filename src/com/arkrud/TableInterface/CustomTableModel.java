@@ -33,10 +33,12 @@ import com.arkrud.aws.StaticFactories.EC2Common;
 import com.arkrud.aws.StaticFactories.S3Common;
 
 public class CustomTableModel extends AbstractTableModel implements TableModelListener  {
+	
 	public CustomTableModel(boolean isEditableTable) {
 		super();
 		this.isEditableTable = isEditableTable;
 		addTableModelListener(this);
+		
 
 	}
 
@@ -46,7 +48,6 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 	private boolean isFileBrowser;
 	private String localPath;
 	private boolean isEditableTable;
-	private static final int BOOLEAN_COLUMN = 1;
 	private Dashboard dash;
 
 	public void addRow(int row, ArrayList<Object> rowData) {
@@ -55,7 +56,7 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 
 	}
 
-
+    
 
 	public Dashboard getDash() {
 		return dash;
@@ -355,20 +356,21 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 	public void tableChanged(TableModelEvent e) {
 		int row = e.getFirstRow();
 	    int column = e.getColumn();
-	    String treeName = "";
-		try {
-			treeName = (String) ((CustomTableModel) e.getSource()).getValueAt(row, 0);
-		} catch (Exception e2) {
-			// TODO: handle exception
-		}
-	    if (column == BOOLEAN_COLUMN) {
-	        TableModel model = (TableModel) e.getSource();
+	    System.out.println("column number: " + column);
+	    if (column > 0) {
+	    if (getColumnClass(column).getSimpleName().contains("Boolean")) {
+	    	String treeName = "";
+			try {
+				treeName = (String) ((CustomTableModel) e.getSource()).getValueAt(row, 0);
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+	    	TableModel model = (TableModel) e.getSource();
 	        Boolean checked = true;
 			try {
 				checked = (Boolean) model.getValueAt(row, column);
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				//e1.printStackTrace();
+				e1.printStackTrace();
 			}
 	        if (checked) {
 	        	INIFilesFactory.updateINIFileItems(UtilMethodsFactory.getConsoleConfig(),"Applications", "true", treeName);
@@ -382,6 +384,7 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 				} else if (response == JOptionPane.CLOSED_OPTION) {
 				}
 	        }
+	    }
 	    }
 
 	}
