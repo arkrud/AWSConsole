@@ -55,15 +55,15 @@ public class CustomTreeContainer implements TreeNodeState {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setEc2Objects(ArrayList<?> theEC2Objects) {
+	public void setAWSObjects(ArrayList<?> theEC2Objects) {
 		customObjects = (ArrayList<Object>) theEC2Objects;
 	}
 
-	public void addEC2Object(Object ec2Object) {
+	public void addAWSObject(Object ec2Object) {
 		customObjects.add(ec2Object);
 	}
 
-	public void removeEC2Object(Object ec2Object) {
+	public void removeAWSObject(Object ec2Object) {
 		Iterator<?> ec2LCsIterator = customObjects.iterator();
 		while (ec2LCsIterator.hasNext()) {
 			Object customObject = ec2LCsIterator.next();

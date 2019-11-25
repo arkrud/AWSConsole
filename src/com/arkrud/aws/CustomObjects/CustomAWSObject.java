@@ -44,6 +44,10 @@ public interface CustomAWSObject {
 	public default ArrayList<?> getFilteredAWSObjects(CustomIAMInstanceProfile customIAMInstanceProfile) {
 		return null;
 	}
+	
+	public default ArrayList<?> getFilteredAWSObjects(CustomRoute53Zone customRoute53Zone, String appFilter) {
+		return null;
+	}
 
 	public List<Integer> getkeyEvents();
 

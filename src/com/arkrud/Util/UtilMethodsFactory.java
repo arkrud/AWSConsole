@@ -500,7 +500,7 @@ public class UtilMethodsFactory {
 		} else if (response == JOptionPane.YES_OPTION) {
 			customAWSObject.remove();
 			CustomTreeContainer container = (CustomTreeContainer) ((DefaultMutableTreeNode) node.getParent()).getUserObject();
-			container.removeEC2Object(customAWSObject);
+			container.removeAWSObject(customAWSObject);
 			((DefaultTreeModel) tree.getModel()).removeNodeFromParent(node);
 			UtilMethodsFactory.replaceContainerTable(container, dash, node, tree);
 		} else if (response == JOptionPane.CLOSED_OPTION) {
@@ -531,7 +531,7 @@ public class UtilMethodsFactory {
 					DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) table.getParentTreeNode().getChildAt(x);
 					if (((CustomAWSObject) theNode.getUserObject()).getObjectName().contains(awsObject.getObjectName())) {
 						((DefaultTreeModel) table.getTree().getModel()).removeNodeFromParent(theNode);
-						container.removeEC2Object(awsObject);
+						container.removeAWSObject(awsObject);
 					}
 					x++;
 				}

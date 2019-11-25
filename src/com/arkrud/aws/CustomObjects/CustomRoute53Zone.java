@@ -58,6 +58,32 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject {
 		}
 		return customRoute53Zones;
 	}
+	
+	public static ArrayList<ResourceRecordSet> getResourceRecordSets(AWSAccount account, String zoneID, String appFilter) {
+		
+		
+		
+		
+		
+		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(account.getAccountAlias()));
+		ArrayList<ResourceRecordSet> resourceRecordSets = new ArrayList<ResourceRecordSet>();
+		ListResourceRecordSetsRequest request = new ListResourceRecordSetsRequest().withHostedZoneId(zoneID);
+		while (true) {
+			ListResourceRecordSetsResult result = route53.listResourceRecordSets(request);
+			List<ResourceRecordSet> recordList = result.getResourceRecordSets();
+			for (ResourceRecordSet record : recordList) {
+				System.out.println(record.getName());
+				if (record.getName().matches(appFilter)) {
+					resourceRecordSets.add(record);
+				}
+			}
+			if (!result.isTruncated()) {
+				break;
+			}
+		}
+		return resourceRecordSets;
+	}
+
 
 	private static void printRecords(String zoneID, AmazonRoute53 route53) {
 		ListResourceRecordSetsRequest request = new ListResourceRecordSetsRequest().withHostedZoneId(zoneID);
@@ -89,6 +115,7 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject {
 	public CustomRoute53Zone(HostedZone zone) {
 		super();
 		this.zone = zone;
+		
 	}
 
 	@Override

@@ -75,7 +75,7 @@ public class AddSecurityGroupFrame extends JDialog implements ActionListener {
 			CustomEC2SecurityGroup newGroup = new CustomEC2SecurityGroup(account, groupID, null);
 			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newGroup);
 			((DefaultTreeModel) tree.getModel()).insertNodeInto(newNode, node, 0);
-			((CustomTreeContainer) node.getUserObject()).addEC2Object(newGroup);
+			((CustomTreeContainer) node.getUserObject()).addAWSObject(newGroup);
 			UtilMethodsFactory.replaceContainerTable(node.getUserObject(), dash, node, tree);
 			this.dispose();
 		} else if (theButton.getText().equals("Cancel")) {

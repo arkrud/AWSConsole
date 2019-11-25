@@ -27,6 +27,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	private static final long serialVersionUID = 1L;
 	private ResourceRecordSet resourceRecordSet;
 	private String zoneID;
+	private AWSAccount account;
 
 	private static ArrayList<ResourceRecordSet> getResourceRecordSets(AWSAccount account, String zoneID, String appFilter) {
 		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(account.getAccountAlias()));
@@ -47,8 +48,37 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 		}
 		return resourceRecordSets;
 	}
+	
+	
+	private static ArrayList<ResourceRecordSet> getResourceRecordSets(CustomRoute53Zone customRoute53Zone, String appFilter) {
+		
+		System.out.println("here");
+		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(customRoute53Zone.getAccount().getAccountAlias()));
+		ArrayList<ResourceRecordSet> resourceRecordSets = new ArrayList<ResourceRecordSet>();
+		ListResourceRecordSetsRequest request = new ListResourceRecordSetsRequest().withHostedZoneId(customRoute53Zone.getId());
+		while (true) {
+			ListResourceRecordSetsResult result = route53.listResourceRecordSets(request);
+			List<ResourceRecordSet> recordList = result.getResourceRecordSets();
+			for (ResourceRecordSet record : recordList) {
+				if (record.getName().matches(appFilter)) {
+					
+					System.out.println(record.getName());
+					resourceRecordSets.add(record);
+				}
+			}
+			if (!result.isTruncated()) {
+				break;
+			}
+		}
+		return resourceRecordSets;
+	}
+	
 
-	public CustomRoute53DNSRecord(String zoneName) {
+	public CustomRoute53DNSRecord() {
+		
+	}
+	
+	public CustomRoute53DNSRecord(String zoneID) {
 		super();
 		this.zoneID = zoneID;
 	}
@@ -145,6 +175,13 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	@Override
 	public ArrayList<?> getFilteredAWSObjects(AWSAccount account, String appFilter) {
 		return getResourceRecordSets( account, zoneID,  appFilter);
+	}
+
+	
+	
+	@Override
+	public ArrayList<?> getFilteredAWSObjects(CustomRoute53Zone customRoute53Zone, String appFilter) {
+		return getResourceRecordSets(customRoute53Zone, appFilter);
 	}
 
 	@Override
@@ -313,7 +350,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public void setAccount(AWSAccount account) {
-		// TODO Auto-generated method stub
+		this.account = account;
 	}
 
 	@Override
