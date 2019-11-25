@@ -356,7 +356,6 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 	public void tableChanged(TableModelEvent e) {
 		int row = e.getFirstRow();
 	    int column = e.getColumn();
-	    System.out.println("column number: " + column);
 	    if (column > 0) {
 	    if (getColumnClass(column).getSimpleName().contains("Boolean")) {
 	    	String treeName = "";

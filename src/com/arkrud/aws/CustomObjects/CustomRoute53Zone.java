@@ -164,14 +164,6 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject {
 		return UtilMethodsFactory.getAWSRoute53ObjectTagsData(getRoute53ZoneTags(account.getAWSAccountAlias(), getId()).iterator());
 	}
 
-	public List<Tag> getRoute53ZoneTags(String accountAlias, String zoneID) {
-		ListTagsForResourceRequest listTagsForResourceRequest = new ListTagsForResourceRequest().withResourceId(zoneID).withResourceType("hostedzone");
-		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(accountAlias));
-		ListTagsForResourceResult result = route53.listTagsForResource(listTagsForResourceRequest);
-		List<Tag> hostedZoneTags = result.getResourceTagSet().getTags();
-		return hostedZoneTags;
-	}
-
 	@Override
 	public String getCallerReference() {
 		return zone.getCallerReference();
@@ -279,6 +271,14 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject {
 	@Override
 	public Long getResourceRecordSetCount() {
 		return zone.getResourceRecordSetCount();
+	}
+
+	public List<Tag> getRoute53ZoneTags(String accountAlias, String zoneID) {
+		ListTagsForResourceRequest listTagsForResourceRequest = new ListTagsForResourceRequest().withResourceId(zoneID).withResourceType("hostedzone");
+		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(accountAlias));
+		ListTagsForResourceResult result = route53.listTagsForResource(listTagsForResourceRequest);
+		List<Tag> hostedZoneTags = result.getResourceTagSet().getTags();
+		return hostedZoneTags;
 	}
 
 	@Override

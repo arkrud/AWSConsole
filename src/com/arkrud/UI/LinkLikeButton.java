@@ -92,7 +92,6 @@ public class LinkLikeButton extends JButton implements ActionListener, MouseList
 		// TODO Auto-generated method stub
 		LinkLikeButton source = (LinkLikeButton) e.getSource();
 		if(e.getClickCount()==1){
-		System.out.println("source.getName(): " + source.getName());	
 		if (source.getName().equals("TableLinkLikeButton")) {
 			if (source.getText().equals("Tags") || source.getText().equals("Ingress") || source.getText().equals("Egress") || source.getText().equals("Rules") || source.getText().equals("All Actions") || source.getText().equals("All Conditions")
 					|| source.getText().equals("Redirect")  || source.getText().startsWith("ELBs") || source.getText().contains("targetgroup")) {

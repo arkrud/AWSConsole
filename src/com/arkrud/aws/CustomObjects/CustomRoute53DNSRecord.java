@@ -8,35 +8,54 @@ import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.amazonaws.services.route53.AmazonRoute53;
 import com.amazonaws.services.route53.model.AliasTarget;
 import com.amazonaws.services.route53.model.GeoLocation;
-import com.amazonaws.services.route53.model.RRType;
+import com.amazonaws.services.route53.model.ListResourceRecordSetsRequest;
+import com.amazonaws.services.route53.model.ListResourceRecordSetsResult;
 import com.amazonaws.services.route53.model.ResourceRecord;
 import com.amazonaws.services.route53.model.ResourceRecordSet;
+import com.amazonaws.services.route53.AmazonRoute53Client;
 import com.arkrud.TableInterface.CustomTable;
 import com.arkrud.UI.OverviewPanel;
 import com.arkrud.UI.Dashboard.Dashboard;
 import com.arkrud.aws.AWSAccount;
+import com.arkrud.aws.AwsCommon;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
-public class CustomResourceRecordSet extends ResourceRecordSet implements CustomAWSObject {
-	/**
-	 *
-	 */
+public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomAWSObject {
 	private static final long serialVersionUID = 1L;
+	private ResourceRecordSet resourceRecordSet;
+	private String zoneID;
 
-	public CustomResourceRecordSet() {
-		// TODO Auto-generated constructor stub
+	private static ArrayList<ResourceRecordSet> getResourceRecordSets(AWSAccount account, String zoneID, String appFilter) {
+		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(account.getAccountAlias()));
+		ArrayList<ResourceRecordSet> resourceRecordSets = new ArrayList<ResourceRecordSet>();
+		ListResourceRecordSetsRequest request = new ListResourceRecordSetsRequest().withHostedZoneId(zoneID);
+		while (true) {
+			ListResourceRecordSetsResult result = route53.listResourceRecordSets(request);
+			List<ResourceRecordSet> recordList = result.getResourceRecordSets();
+			for (ResourceRecordSet record : recordList) {
+				System.out.println(record.getName());
+				if (record.getName().matches(appFilter)) {
+					resourceRecordSets.add(record);
+				}
+			}
+			if (!result.isTruncated()) {
+				break;
+			}
+		}
+		return resourceRecordSets;
 	}
 
-	public CustomResourceRecordSet(String name, RRType type) {
-		super(name, type);
-		// TODO Auto-generated constructor stub
+	public CustomRoute53DNSRecord(String zoneName) {
+		super();
+		this.zoneID = zoneID;
 	}
 
-	public CustomResourceRecordSet(String name, String type) {
-		super(name, type);
-		// TODO Auto-generated constructor stub
+	public CustomRoute53DNSRecord(ResourceRecordSet resourceRecordSet) {
+		super();
+		this.resourceRecordSet = resourceRecordSet;
 	}
 
 	@Override
@@ -125,8 +144,7 @@ public class CustomResourceRecordSet extends ResourceRecordSet implements Custom
 
 	@Override
 	public ArrayList<?> getFilteredAWSObjects(AWSAccount account, String appFilter) {
-		// TODO Auto-generated method stub
-		return null;
+		return getResourceRecordSets( account, zoneID,  appFilter);
 	}
 
 	@Override
@@ -302,6 +320,4 @@ public class CustomResourceRecordSet extends ResourceRecordSet implements Custom
 	public void showDetailesFrame(AWSAccount account, CustomAWSObject customAWSObject, JScrollableDesktopPane jScrollableDesktopPan) {
 		// TODO Auto-generated method stub
 	}
-
-
 }

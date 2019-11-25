@@ -107,7 +107,6 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 	 * @param e
 	 */
 	private void showPopup(MouseEvent e) {
-		System.out.println("!!!!!!!!!!!!!!!!!!!");
 		table = (CustomTable) e.getSource();
 		if (e.isPopupTrigger()) {
 			if (table.getSelectedRow() == table.rowAtPoint(e.getPoint())) {
@@ -116,7 +115,6 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 				int realRowIndex = table.convertRowIndexToModel(table.rowAtPoint(e.getPoint()));
 				Object cellValue = table.getModel().getValueAt(realRowIndex, realColumnIndex);
 				String columnName = table.getModel().getColumnName(realColumnIndex);
-				System.out.println("columnName: " + columnName);
 				int selectedRowsCount = table.getSelectedRowCount();
 				if (cellValue instanceof AWSAccount) {
 					String[] menus = { "Delete AWS Account" };
@@ -141,12 +139,10 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 					}
 				} else if (cellValue instanceof Integer) {
 					if (columnName.contains("Load Balancer Port")) {
-						System.out.println("cellClass: " + cellValue.getClass().getSimpleName());
 						String[] menus = { "Open Endpoint" };
 						addMenuItems(menus);
 					}
 				} else if (cellValue instanceof LinkLikeButton) {
-					System.out.println("cellClass: " + cellValue.getClass().getSimpleName());
 					customAWSObject = ((LinkLikeButton) table.getModel().getValueAt(mRowIndex, vColIndex)).getCustomAWSObject();
 					customAWSObject.setAccount(awsAccount);
 					if (selectedRowsCount > 1) {
@@ -155,7 +151,7 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 						addMenuItems(customAWSObject.defineTableSingleSelectionDropDown());
 					}
 				} else {
-					System.out.println("cellClass: " + cellValue.getClass().getSimpleName());
+					
 				}
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
