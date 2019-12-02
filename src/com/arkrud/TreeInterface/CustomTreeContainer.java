@@ -114,12 +114,11 @@ public class CustomTreeContainer implements TreeNodeState {
 			e.printStackTrace();
 		}
 		try {
-			((CustomAWSObject) obj).getFilteredAWSObjects(account, appFilter);
+			return ((CustomAWSObject) obj).getFilteredAWSObjects(account, appFilter);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
-		return ((CustomAWSObject) obj).getFilteredAWSObjects(account, appFilter);
 	}
 
 	@Override

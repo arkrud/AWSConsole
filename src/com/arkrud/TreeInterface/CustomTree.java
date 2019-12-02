@@ -63,43 +63,26 @@ import com.arkrud.aws.CustomObjects.CustomRoute53Zone;
 import com.arkrud.aws.StaticFactories.S3Common;
 
 /**
- * Class to build AWS Objects Tree (OT) and AWS Objects Configuration Tree
- * (OCT).<br>
- * OT will organize AWS object accessible by user by Region, AWS Account, AWS
- * Service, and AWS Object type. <br>
- * OT nodes provide drop down menus relevant to the actions allowed for object
- * the node represents including action to refresh node children. <br>
- * Double click on container nodes will add associated object table control with
- * data for filtered list of objects in multitable view area. <br>
- * OT objects are rendered with object and container specific icons and object
- * and container names <br>
+ * Class to build AWS Objects Tree (OT) and AWS Objects Configuration Tree (OCT).<br>
+ * OT will organize AWS object accessible by user by Region, AWS Account, AWS Service, and AWS Object type. <br>
+ * OT nodes provide drop down menus relevant to the actions allowed for object the node represents including action to refresh node children. <br>
+ * Double click on container nodes will add associated object table control with data for filtered list of objects in multitable view area. <br>
+ * OT objects are rendered with object and container specific icons and object and container names <br>
  * OCT provides the view of the same tree hierarchy as OT tree provides. <br>
- * But each object is presented as check box to activate or deactivate retrieval
- * of AWS objects data based on accounts, services, and object types user
- * desired. <br>
- * The OCT also provides filter objects which can be used to filter retrieval of
- * the AWS objects based on text pattern. <br>
- * After all selections in OCT tree are done the root "Select To Finish
- * Configuration" node needs to be selected to apply the changes. <br>
- * After objects and containers are checked in OCT OT tree needs to be refreshed
- * to reflect the configuration change and retrieve desired objects from AWS
- * cloud. <br>
- * Tree interface provides indeterministic progress bar while the AWS objects
- * are retrieving which can take significant time for of large amount of them
- * requested. <br>
+ * But each object is presented as check box to activate or deactivate retrieval of AWS objects data based on accounts, services, and object types user desired. <br>
+ * The OCT also provides filter objects which can be used to filter retrieval of the AWS objects based on text pattern. <br>
+ * After all selections in OCT tree are done the root "Select To Finish Configuration" node needs to be selected to apply the changes. <br>
+ * After objects and containers are checked in OCT OT tree needs to be refreshed to reflect the configuration change and retrieve desired objects from AWS cloud. <br>
+ * Tree interface provides indeterministic progress bar while the AWS objects are retrieving which can take significant time for of large amount of them requested. <br>
  */
-public class CustomTree extends JPanel
-		implements TreeWillExpandListener, TreeSelectionListener, PropertyChangeListener {
+public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSelectionListener, PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
-	private Class<?> treeContainerEC2Classes[] = { CustomEC2SecurityGroup.class, CustomEC2ELB.class,
-			CustomEC2ELBV2.class, CustomEC2TargetGroup.class, CustomEC2KeyPair.class, CustomEC2ELBPolicyType.class,
-			CustomEC2Instance.class, CustomEC2AMI.class, CustomEC2Volume.class, CustomEC2SnapShot.class,
-			CustomEC2Asg.class, CustomEC2LC.class, CustomEC2NetworkInterface.class };
+	private Class<?> treeContainerEC2Classes[] = { CustomEC2SecurityGroup.class, CustomEC2ELB.class, CustomEC2ELBV2.class, CustomEC2TargetGroup.class, CustomEC2KeyPair.class, CustomEC2ELBPolicyType.class, CustomEC2Instance.class, CustomEC2AMI.class,
+			CustomEC2Volume.class, CustomEC2SnapShot.class, CustomEC2Asg.class, CustomEC2LC.class, CustomEC2NetworkInterface.class };
 	private Class<?> treeContainerIAMClasses[] = { CustomIAMInstanceProfile.class };
 	private Class<?> treeContainerRoute53Classes[] = { CustomRoute53Zone.class };
-	public String ec2TreeContainerNames[] = { "Security Groups", "Load Balancers", "V2 Load Balancers", "Target Groups",
-			"Key Pairs", "ELB Polices", "Instances", "AMIs", "Volumes", "Snapshots", "Autoscaling Groups",
-			"Launch Configurations", "Network Interfaces" };
+	public String ec2TreeContainerNames[] = { "Security Groups", "Load Balancers", "V2 Load Balancers", "Target Groups", "Key Pairs", "ELB Polices", "Instances", "AMIs", "Volumes", "Snapshots", "Autoscaling Groups", "Launch Configurations",
+			"Network Interfaces" };
 	public String iamTreeContainerNames[] = { "Instance Profiles" };
 	public String cfTreeContainerNames[] = { "Stacks" };
 	public String vpcTreeContainerNames[] = { "Subnets" };
@@ -125,7 +108,7 @@ public class CustomTree extends JPanel
 	 * </ul>
 	 * <p>
 	 *
-	 * @param dash     reference to the Dashboard object
+	 * @param dash reference to the Dashboard object
 	 * @param treeType tree usage identifier (OT or OCT)
 	 */
 	public CustomTree(Dashboard dash, String treeType) {
@@ -214,28 +197,21 @@ public class CustomTree extends JPanel
 			awsRegionTreeNode = new DefaultMutableTreeNode(customRegionObject);
 			top.add(awsRegionTreeNode);
 			regionNodes.add(awsRegionTreeNode);
-			Iterator<AWSAccount> accountsIterator = INIFilesFactory.readAWSINIAccounts(
-					UtilMethodsFactory.getAWSAPIINIConfigs("credentials"), UtilMethodsFactory.getConsoleConfig(),
-					UtilMethodsFactory.getAWSAPIINIConfigs("config"), false).iterator();
+			Iterator<AWSAccount> accountsIterator = INIFilesFactory.readAWSINIAccounts(UtilMethodsFactory.getAWSAPIINIConfigs("credentials"), UtilMethodsFactory.getConsoleConfig(), UtilMethodsFactory.getAWSAPIINIConfigs("config"), false).iterator();
 			while (accountsIterator.hasNext()) {
 				AWSAccount theAWSAccount = accountsIterator.next();
 				if (theAWSAccount.getAccountRegion().contains(customRegionObject.getObjectName())) {
 					awsAccount = new DefaultMutableTreeNode(theAWSAccount);
 					if (treeType.equals("config")) {
-						((AWSAccount) awsAccount.getUserObject()).setSelected(Boolean
-								.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(),
-										theAWSAccount.getAccountAlias(), theAWSAccount.getAccountAlias())));
+						((AWSAccount) awsAccount.getUserObject()).setSelected(Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), theAWSAccount.getAccountAlias(), theAWSAccount.getAccountAlias())));
 						awsRegionTreeNode.add(awsAccount);
 						int y = 0;
 						while (y < UtilMethodsFactory.awsServicesInfo.length) {
-							if (INIFilesFactory.hasItemInSection(UtilMethodsFactory.getConsoleConfig(),
-									theAWSAccount.getAccountAlias(), UtilMethodsFactory.awsServicesInfo[y][0])) {
+							if (INIFilesFactory.hasItemInSection(UtilMethodsFactory.getConsoleConfig(), theAWSAccount.getAccountAlias(), UtilMethodsFactory.awsServicesInfo[y][0])) {
 								AWSService container = new AWSService();
 								container.setAwsServiceName(UtilMethodsFactory.awsServicesInfo[y][0]);
 								container.setAWSAccountAlias(theAWSAccount.getAccountAlias());
-								container.setSelected(Boolean.valueOf(INIFilesFactory.getItemValueFromINI(
-										UtilMethodsFactory.getConsoleConfig(), theAWSAccount.getAccountAlias(),
-										UtilMethodsFactory.awsServicesInfo[y][0])));
+								container.setSelected(Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), theAWSAccount.getAccountAlias(), UtilMethodsFactory.awsServicesInfo[y][0])));
 								DefaultMutableTreeNode containerNode = new DefaultMutableTreeNode(container);
 								awsAccount.add(containerNode);
 							} else {
@@ -245,15 +221,12 @@ public class CustomTree extends JPanel
 								container.setSelected(false);
 								DefaultMutableTreeNode containerNode = new DefaultMutableTreeNode(container);
 								awsAccount.add(containerNode);
-								INIFilesFactory.addINIFileItemToSection(UtilMethodsFactory.getConsoleConfig(),
-										theAWSAccount.getAccountAlias(), UtilMethodsFactory.awsServicesInfo[y][0],
-										false);
+								INIFilesFactory.addINIFileItemToSection(UtilMethodsFactory.getConsoleConfig(), theAWSAccount.getAccountAlias(), UtilMethodsFactory.awsServicesInfo[y][0], false);
 							}
 							y++;
 						}
 					} else {
-						if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(),
-								theAWSAccount.getAccountAlias(), theAWSAccount.getAccountAlias()))) {
+						if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), theAWSAccount.getAccountAlias(), theAWSAccount.getAccountAlias()))) {
 							awsRegionTreeNode.add(awsAccount);
 						}
 						Iterator<AWSService> awsServicesIterator = theAWSAccount.getAwsServices().iterator();
@@ -288,10 +261,8 @@ public class CustomTree extends JPanel
 	}
 
 	/**
-	 * Build the configuration tree to define which AWS accounts, services, and
-	 * objects will be displayed<br>
-	 * and trees of filtered AWS objects grouped by Region, AWS Account, AWS
-	 * service, and object types <br>
+	 * Build the configuration tree to define which AWS accounts, services, and objects will be displayed<br>
+	 * and trees of filtered AWS objects grouped by Region, AWS Account, AWS service, and object types <br>
 	 */
 	@Override
 	public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
@@ -311,8 +282,7 @@ public class CustomTree extends JPanel
 				SwingWorker<Void, Void> w = new SwingWorker<Void, Void>() {
 					@Override
 					protected Void doInBackground() throws Exception {
-						populateAccountsAndServices((DefaultMutableTreeNode) (e.getPath().getLastPathComponent()),
-								filter);
+						populateAccountsAndServices((DefaultMutableTreeNode) (e.getPath().getLastPathComponent()), filter);
 						return null;
 					};
 
@@ -331,18 +301,15 @@ public class CustomTree extends JPanel
 	}
 
 	/**
-	 * Populate the configuration tree to define which AWS accounts, services, and
-	 * objects will be displayed based on data saved in INI configuration file<br>
+	 * Populate the configuration tree to define which AWS accounts, services, and objects will be displayed based on data saved in INI configuration file<br>
 	 */
 	private void populateAWSObjectsConfigs(DefaultMutableTreeNode node) {
 		if (node.getUserObject() instanceof AWSAccount) {
 			String accountAlias = ((AWSAccount) node.getUserObject()).getAccountAlias();
 			if (INIFilesFactory.hasItemInSection(UtilMethodsFactory.getConsoleConfig(), accountAlias, accountAlias)) {
-				((AWSAccount) node.getUserObject()).setSelected(Boolean.valueOf(INIFilesFactory
-						.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), accountAlias, accountAlias)));
+				((AWSAccount) node.getUserObject()).setSelected(Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), accountAlias, accountAlias)));
 			} else {
-				INIFilesFactory.addINIFileItemToSection(UtilMethodsFactory.getConsoleConfig(), accountAlias,
-						accountAlias, true);
+				INIFilesFactory.addINIFileItemToSection(UtilMethodsFactory.getConsoleConfig(), accountAlias, accountAlias, true);
 				((AWSAccount) node.getUserObject()).setSelected(true);
 			}
 			Enumeration<?> children = node.preorderEnumeration();
@@ -350,14 +317,10 @@ public class CustomTree extends JPanel
 				DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) children.nextElement();
 				if (theNode.getUserObject() instanceof AWSService) {
 					String serviceName = ((AWSService) theNode.getUserObject()).getAwsServiceName();
-					if (INIFilesFactory.hasItemInSection(UtilMethodsFactory.getConsoleConfig(), accountAlias,
-							serviceName)) {
-						((AWSService) theNode.getUserObject())
-								.setSelected(Boolean.valueOf(INIFilesFactory.getItemValueFromINI(
-										UtilMethodsFactory.getConsoleConfig(), accountAlias, serviceName)));
+					if (INIFilesFactory.hasItemInSection(UtilMethodsFactory.getConsoleConfig(), accountAlias, serviceName)) {
+						((AWSService) theNode.getUserObject()).setSelected(Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), accountAlias, serviceName)));
 					} else {
-						INIFilesFactory.addINIFileItemToSection(UtilMethodsFactory.getConsoleConfig(), accountAlias,
-								serviceName, true);
+						INIFilesFactory.addINIFileItemToSection(UtilMethodsFactory.getConsoleConfig(), accountAlias, serviceName, true);
 						((AWSService) theNode.getUserObject()).setSelected(true);
 					}
 					if (serviceName.contains("S3")) {
@@ -387,21 +350,17 @@ public class CustomTree extends JPanel
 		}
 	}
 
-	private void populateServiceAWSObjectsConfigs(DefaultMutableTreeNode theNode, String accountAlias,
-			String treeContainerNames[]) {
+	private void populateServiceAWSObjectsConfigs(DefaultMutableTreeNode theNode, String accountAlias, String treeContainerNames[]) {
 		int x = 0;
 		CustomTreeContainer container;
 		while (x < treeContainerNames.length) {
 			container = new CustomTreeContainer();
 			container.setContainerName(treeContainerNames[x]);
 			container.setAWSAccountAlias(accountAlias);
-			if (INIFilesFactory.hasItemInSection(UtilMethodsFactory.getConsoleConfig(), accountAlias,
-					treeContainerNames[x])) {
-				container.setSelected(Boolean.valueOf(INIFilesFactory.getItemValueFromINI(
-						UtilMethodsFactory.getConsoleConfig(), accountAlias, treeContainerNames[x])));
+			if (INIFilesFactory.hasItemInSection(UtilMethodsFactory.getConsoleConfig(), accountAlias, treeContainerNames[x])) {
+				container.setSelected(Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), accountAlias, treeContainerNames[x])));
 			} else {
-				INIFilesFactory.addINIFileItemToSection(UtilMethodsFactory.getConsoleConfig(), accountAlias,
-						treeContainerNames[x], container.isSelected());
+				INIFilesFactory.addINIFileItemToSection(UtilMethodsFactory.getConsoleConfig(), accountAlias, treeContainerNames[x], container.isSelected());
 			}
 			DefaultMutableTreeNode containerNode = new DefaultMutableTreeNode(container);
 			theNode.add(containerNode);
@@ -410,8 +369,7 @@ public class CustomTree extends JPanel
 	}
 
 	/**
-	 * Populate AWS accounts and services based on data saved in INI configuration
-	 * file<br>
+	 * Populate AWS accounts and services based on data saved in INI configuration file<br>
 	 */
 	private void populateAccountsAndServices(DefaultMutableTreeNode node, String appFilter) {
 		if (node.getUserObject() instanceof AWSAccount) {
@@ -447,8 +405,7 @@ public class CustomTree extends JPanel
 	 */
 	private void populateS3Nodes(DefaultMutableTreeNode s3Node) {
 		AWSAccount awsAccount = ((AWSService) s3Node.getUserObject()).getTheAccount();
-		ArrayList<Bucket> s3BucketsObjects = S3Common
-				.retrieveS3Buckets(S3Common.connectToS3(AwsCommon.getAWSCredentials(awsAccount.getAccountAlias())));
+		ArrayList<Bucket> s3BucketsObjects = S3Common.retrieveS3Buckets(S3Common.connectToS3(AwsCommon.getAWSCredentials(awsAccount.getAccountAlias())));
 		Iterator<Bucket> s3BucketsIterator = s3BucketsObjects.iterator();
 		while (s3BucketsIterator.hasNext()) {
 			Bucket bucket = s3BucketsIterator.next();
@@ -470,8 +427,7 @@ public class CustomTree extends JPanel
 			objectsMap.put(treeContainerEC2Classes[i], ec2TreeContainerNames[i]);
 		}
 		for (Class<?> key : objectsMap.keySet()) {
-			if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(),
-					awsAccount.getAccountAlias(), objectsMap.get(key)))) {
+			if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), awsAccount.getAccountAlias(), objectsMap.get(key)))) {
 				CustomTreeContainer container = new CustomTreeContainer();
 				container.setAccount(awsAccount);
 				container.setChildObject(key);
@@ -507,20 +463,17 @@ public class CustomTree extends JPanel
 			ec2ELBPolicyType.setAccount(container.getAccount());
 			DefaultMutableTreeNode elbPolicyTypeNode = new DefaultMutableTreeNode(ec2ELBPolicyType);
 			node.add(elbPolicyTypeNode);
-			Iterator<PolicyDescription> defaultElbPolicies = customEC2ELB.getDefaultELBPolicies(container.getAccount())
-					.iterator();
+			Iterator<PolicyDescription> defaultElbPolicies = customEC2ELB.getDefaultELBPolicies(container.getAccount()).iterator();
 			while (defaultElbPolicies.hasNext()) {
 				PolicyDescription policyDescription = defaultElbPolicies.next();
 				if (policyDescription.getPolicyTypeName().equals(ec2ELBPolicyType.getPolicyName())) {
-					CustomELBPolicyDescription elbPOlicyDescription = new CustomELBPolicyDescription(policyDescription,
-							null);
+					CustomELBPolicyDescription elbPOlicyDescription = new CustomELBPolicyDescription(policyDescription, null);
 					DefaultMutableTreeNode ec2ELBPolicyNode = new DefaultMutableTreeNode(elbPOlicyDescription);
 					elbPolicyTypeNode.add(ec2ELBPolicyNode);
 				}
 			}
 		}
-		Hashtable<CustomEC2ELB, PolicyDescription> elbPolicies = customEC2ELB
-				.getAllELBsSLListenerPolicies(((CustomTreeContainer) node.getUserObject()).getAccount());
+		Hashtable<CustomEC2ELB, PolicyDescription> elbPolicies = customEC2ELB.getAllELBsSLListenerPolicies(((CustomTreeContainer) node.getUserObject()).getAccount());
 		Enumeration<?> elbPolicesChildrenNodes = node.preorderEnumeration();
 		Collection<String> policyNames = new ArrayList<String>();
 		while (elbPolicesChildrenNodes.hasMoreElements()) {
@@ -529,12 +482,9 @@ public class CustomTree extends JPanel
 				Set<CustomEC2ELB> elbs = elbPolicies.keySet();
 				for (CustomEC2ELB elb : elbs) {
 					PolicyDescription policyDescription = elbPolicies.get(elb);
-					if (policyDescription.getPolicyTypeName()
-							.equals(((CustomEC2ELBPolicyType) eldPolicyNode.getUserObject()).getPolicyName())
-							&& !policyNames.contains(policyDescription.getPolicyName())) {
+					if (policyDescription.getPolicyTypeName().equals(((CustomEC2ELBPolicyType) eldPolicyNode.getUserObject()).getPolicyName()) && !policyNames.contains(policyDescription.getPolicyName())) {
 						policyNames.add(policyDescription.getPolicyName());
-						CustomELBPolicyDescription elbPOlicyDescription = new CustomELBPolicyDescription(
-								policyDescription, elb);
+						CustomELBPolicyDescription elbPOlicyDescription = new CustomELBPolicyDescription(policyDescription, elb);
 						DefaultMutableTreeNode ec2ELBPolicyNode = new DefaultMutableTreeNode(elbPOlicyDescription);
 						eldPolicyNode.add(ec2ELBPolicyNode);
 					}
@@ -553,8 +503,7 @@ public class CustomTree extends JPanel
 			objectsMap.put(treeContainerIAMClasses[i], iamTreeContainerNames[i]);
 		}
 		for (Class<?> key : objectsMap.keySet()) {
-			if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(),
-					awsAccount.getAccountAlias(), objectsMap.get(key)))) {
+			if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), awsAccount.getAccountAlias(), objectsMap.get(key)))) {
 				CustomTreeContainer container = new CustomTreeContainer();
 				container.setAccount(awsAccount);
 				container.setChildObject(key);
@@ -580,8 +529,7 @@ public class CustomTree extends JPanel
 			objectsMap.put(treeContainerRoute53Classes[i], route53TreeContainerNames[i]);
 		}
 		for (Class<?> key : objectsMap.keySet()) {
-			if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(),
-					awsAccount.getAccountAlias(), objectsMap.get(key)))) {
+			if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), awsAccount.getAccountAlias(), objectsMap.get(key)))) {
 				CustomTreeContainer container = new CustomTreeContainer();
 				container.setAccount(awsAccount);
 				container.setChildObject(key);
@@ -626,35 +574,25 @@ public class CustomTree extends JPanel
 			if (customObjectNode.getUserObject() instanceof CustomIAMInstanceProfile) {
 				CustomIAMRole role = new CustomIAMRole();
 				role.setAccount(account);
-				Iterator<?> customIAMRolesIterator = role
-						.getFilteredAWSObjects((CustomIAMInstanceProfile) customObjectNode.getUserObject()).iterator();
+				Iterator<?> customIAMRolesIterator = role.getFilteredAWSObjects((CustomIAMInstanceProfile) customObjectNode.getUserObject()).iterator();
 				while (customIAMRolesIterator.hasNext()) {
-					DefaultMutableTreeNode customIAMRoleNode = new DefaultMutableTreeNode(
-							customIAMRolesIterator.next());
+					DefaultMutableTreeNode customIAMRoleNode = new DefaultMutableTreeNode(customIAMRolesIterator.next());
 					customObjectNode.add(customIAMRoleNode);
 				}
 			} else if (customObjectNode.getUserObject() instanceof CustomRoute53Zone) {
-				/*
-				 * CustomRoute53DNSRecord customRoute53DNSRecord = new CustomRoute53DNSRecord();
-				 * customRoute53DNSRecord.setAccount(account); System.out.println(appFilter);
-				 * System.out.println(account.getAccountAlias()); Iterator<?>
-				 * customRoute53DNSRecordsIterator = customRoute53DNSRecord
-				 * .getFilteredAWSObjects((CustomRoute53Zone) customObjectNode.getUserObject(),
-				 * appFilter) .iterator();
-				 * 
-				 * while (customRoute53DNSRecordsIterator.hasNext()) { DefaultMutableTreeNode
-				 * customRoute53DNSRecordNode = new DefaultMutableTreeNode(
-				 * customRoute53DNSRecordsIterator.next());
-				 * customObjectNode.add(customRoute53DNSRecordNode); }
-				 */
-
+				CustomRoute53DNSRecord customRoute53DNSRecord = new CustomRoute53DNSRecord();
+				customRoute53DNSRecord.setAccount(account);
+				Iterator<?> customRoute53DNSRecordsIterator = customRoute53DNSRecord.getFilteredAWSObjects((CustomRoute53Zone) customObjectNode.getUserObject(), appFilter).iterator();
+				while (customRoute53DNSRecordsIterator.hasNext()) {
+					DefaultMutableTreeNode customRoute53DNSRecordNode = new DefaultMutableTreeNode(customRoute53DNSRecordsIterator.next());
+					customObjectNode.add(customRoute53DNSRecordNode);
+				}
 			}
 		}
 	}
 
 	/**
-	 * Public method to refresh tree after changing the filters with progress bar.
-	 * <br>
+	 * Public method to refresh tree after changing the filters with progress bar. <br>
 	 */
 	public void refreshTreeNodeWithProgress(DefaultMutableTreeNode node, boolean decorationState, String appFilter) {
 		final CustomProgressBar progFrame = new CustomProgressBar(true, decorationState, "Loading EC2 Objects");
@@ -688,9 +626,7 @@ public class CustomTree extends JPanel
 			filter = "(.*)(?i)" + treeType + "(.*)";
 		}
 		/*
-		 * if (node == null) { top.removeAllChildren(); treeModel.reload(); try {
-		 * invokeWithProgressBar(false); } catch (Exception e) { e.printStackTrace(); }
-		 * expandAllNodes(); } else {
+		 * if (node == null) { top.removeAllChildren(); treeModel.reload(); try { invokeWithProgressBar(false); } catch (Exception e) { e.printStackTrace(); } expandAllNodes(); } else {
 		 */
 		node.removeAllChildren();
 		treeModel.nodeStructureChanged(node);
@@ -711,15 +647,11 @@ public class CustomTree extends JPanel
 			}
 		} else if (node.getUserObject() instanceof AWSAccount) {
 			if (treeType.equals("config")) {
-				Iterator<AWSAccount> accountsIterator = INIFilesFactory.readAWSINIAccounts(
-						UtilMethodsFactory.getAWSAPIINIConfigs("credentials"), UtilMethodsFactory.getConsoleConfig(),
-						UtilMethodsFactory.getAWSAPIINIConfigs("config"), true).iterator();
+				Iterator<AWSAccount> accountsIterator = INIFilesFactory.readAWSINIAccounts(UtilMethodsFactory.getAWSAPIINIConfigs("credentials"), UtilMethodsFactory.getConsoleConfig(), UtilMethodsFactory.getAWSAPIINIConfigs("config"), true)
+						.iterator();
 				while (accountsIterator.hasNext()) {
 					AWSAccount theAWSAccount = accountsIterator.next();
-					if (theAWSAccount.getAccountRegion()
-							.contains(((AWSAccount) node.getUserObject()).getAccontRegionObject().getName())
-							&& theAWSAccount.getAccountAlias()
-									.equals(((AWSAccount) node.getUserObject()).getAccountAlias())) {
+					if (theAWSAccount.getAccountRegion().contains(((AWSAccount) node.getUserObject()).getAccontRegionObject().getName()) && theAWSAccount.getAccountAlias().equals(((AWSAccount) node.getUserObject()).getAccountAlias())) {
 						node.setUserObject(theAWSAccount);
 						Iterator<AWSService> awsServicesIterator = null;
 						awsServicesIterator = theAWSAccount.getAwsServices().iterator();
@@ -732,15 +664,11 @@ public class CustomTree extends JPanel
 					}
 				}
 			} else {
-				Iterator<AWSAccount> accountsIterator = INIFilesFactory.readAWSINIAccounts(
-						UtilMethodsFactory.getAWSAPIINIConfigs("credentials"), UtilMethodsFactory.getConsoleConfig(),
-						UtilMethodsFactory.getAWSAPIINIConfigs("config"), false).iterator();
+				Iterator<AWSAccount> accountsIterator = INIFilesFactory.readAWSINIAccounts(UtilMethodsFactory.getAWSAPIINIConfigs("credentials"), UtilMethodsFactory.getConsoleConfig(), UtilMethodsFactory.getAWSAPIINIConfigs("config"), false)
+						.iterator();
 				while (accountsIterator.hasNext()) {
 					AWSAccount theAWSAccount = accountsIterator.next();
-					if (theAWSAccount.getAccountRegion()
-							.contains(((AWSAccount) node.getUserObject()).getAccontRegionObject().getName())
-							&& theAWSAccount.getAccountAlias()
-									.equals(((AWSAccount) node.getUserObject()).getAccountAlias())) {
+					if (theAWSAccount.getAccountRegion().contains(((AWSAccount) node.getUserObject()).getAccontRegionObject().getName()) && theAWSAccount.getAccountAlias().equals(((AWSAccount) node.getUserObject()).getAccountAlias())) {
 						node.setUserObject(theAWSAccount);
 						Iterator<AWSService> awsServicesIterator = null;
 						awsServicesIterator = theAWSAccount.getAwsServices().iterator();
@@ -800,8 +728,7 @@ public class CustomTree extends JPanel
 	}
 
 	/**
-	 * Register a tree selection listener to detect when the user selects a node in
-	 * a tree. <br>
+	 * Register a tree selection listener to detect when the user selects a node in a tree. <br>
 	 */
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
@@ -810,20 +737,11 @@ public class CustomTree extends JPanel
 		if (node == null)
 			return;
 	}
-
 	/*
-	 * private void invokeWithProgressBar(boolean decorationState) { final
-	 * CustomProgressBar progFrame = new CustomProgressBar(true, decorationState,
-	 * "Loading EC2 Objects"); progFrame.getPb().setIndeterminate(true);
-	 * SwingWorker<Void, Void> w = new SwingWorker<Void, Void>() {
-	 * 
-	 * @Override protected Void doInBackground() throws Exception {
-	 * createNodes(top); return null; };
-	 * 
-	 * // this is called when the SwingWorker's doInBackground finishes
-	 * 
-	 * @Override protected void done() { progFrame.getPb().setIndeterminate(false);
-	 * progFrame.setVisible(false); // hide my progress bar JFrame }; };
-	 * w.addPropertyChangeListener(this); w.execute(); progFrame.setVisible(true); }
+	 * private void invokeWithProgressBar(boolean decorationState) { final CustomProgressBar progFrame = new CustomProgressBar(true, decorationState, "Loading EC2 Objects");
+	 * progFrame.getPb().setIndeterminate(true); SwingWorker<Void, Void> w = new SwingWorker<Void, Void>() {
+	 * @Override protected Void doInBackground() throws Exception { createNodes(top); return null; }; // this is called when the SwingWorker's doInBackground finishes
+	 * @Override protected void done() { progFrame.getPb().setIndeterminate(false); progFrame.setVisible(false); // hide my progress bar JFrame }; }; w.addPropertyChangeListener(this); w.execute();
+	 * progFrame.setVisible(true); }
 	 */
 }

@@ -52,54 +52,12 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject {
 		CustomRoute53Zone customRoute53Zone = null;
 		while (hostedZonesIterator.hasNext()) {
 			HostedZone zone = hostedZonesIterator.next();
-			printRecords( zone.getId(),  route53);
 			customRoute53Zone = new CustomRoute53Zone(zone);
 			customRoute53Zones.add(customRoute53Zone);
 		}
 		return customRoute53Zones;
 	}
 	
-	public static ArrayList<ResourceRecordSet> getResourceRecordSets(AWSAccount account, String zoneID, String appFilter) {
-		
-		
-		
-		
-		
-		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(account.getAccountAlias()));
-		ArrayList<ResourceRecordSet> resourceRecordSets = new ArrayList<ResourceRecordSet>();
-		ListResourceRecordSetsRequest request = new ListResourceRecordSetsRequest().withHostedZoneId(zoneID);
-		while (true) {
-			ListResourceRecordSetsResult result = route53.listResourceRecordSets(request);
-			List<ResourceRecordSet> recordList = result.getResourceRecordSets();
-			for (ResourceRecordSet record : recordList) {
-				System.out.println(record.getName());
-				if (record.getName().matches(appFilter)) {
-					resourceRecordSets.add(record);
-				}
-			}
-			if (!result.isTruncated()) {
-				break;
-			}
-		}
-		return resourceRecordSets;
-	}
-
-
-	private static void printRecords(String zoneID, AmazonRoute53 route53) {
-		ListResourceRecordSetsRequest request = new ListResourceRecordSetsRequest().withHostedZoneId(zoneID);
-		while (true) {
-			ListResourceRecordSetsResult result = route53.listResourceRecordSets(request);
-			List<ResourceRecordSet> recordList = result.getResourceRecordSets();
-			for (ResourceRecordSet record : recordList) {
-				System.out.println(record.getName());
-			}
-			if (!result.isTruncated()) {
-				break;
-			}
-			request.setStartRecordName(result.getNextRecordName());
-		}
-	}
-
 	private AWSAccount account;
 	private HostedZone zone;
 	private String objectNickName = "Hosted Zone";

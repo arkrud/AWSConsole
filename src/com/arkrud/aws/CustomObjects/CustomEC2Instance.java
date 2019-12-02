@@ -704,6 +704,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	}
 
 	private ArrayList<CustomEC2Instance> retriveEC2Instances(AWSAccount account, boolean filtered, String appFilter) {
+		System.out.println("!!!!!!!!!!!!!");
 		ArrayList<CustomEC2Instance> instances = new ArrayList<CustomEC2Instance>();
 		DescribeInstancesResult describeInstancesResult = null;
 		try {
@@ -722,26 +723,31 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 			Iterator<Instance> instanceIterator = reservation.getInstances().iterator();
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
+				System.out.println("5: " + instance.getInstanceId());
 				customInstance = new CustomEC2Instance(instance);
 				if (appFilter != null) {
 					if (filtered) {
 						if (UtilMethodsFactory.getEC2ObjectFilterTag(instance.getTags(), "Name").matches(appFilter)) {
 							customInstance.setAccount(account);
 							instances.add(customInstance);
+							System.out.println("1: " + instance.getInstanceId());
 						}
 					} else {
 						customInstance.setAccount(account);
 						instances.add(customInstance);
+						System.out.println("2: " + instance.getInstanceId());
 					}
 				} else {
 					if (filtered) {
 						if (UtilMethodsFactory.getEC2ObjectFilterTag(instance.getTags(), "Name").matches(UtilMethodsFactory.getMatchString(account))) {
 							customInstance.setAccount(account);
 							instances.add(customInstance);
+							System.out.println("3: " + instance.getInstanceId());
 						}
 					} else {
 						customInstance.setAccount(account);
 						instances.add(customInstance);
+						System.out.println("4: " + instance.getInstanceId());
 					}
 				}
 			}
@@ -771,7 +777,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
 				customInstance = new CustomEC2Instance(instance);
-
+				System.out.println("5: " + instance.getInstanceId());
 		}
 		}
 		return customInstance;
@@ -798,6 +804,8 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 			Iterator<Instance> instanceIterator = reservation.getInstances().iterator();
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
+				System.out.println(instance.getInstanceId());
+				
 				customInstance = new CustomEC2Instance(instance);
 
 		}
@@ -817,6 +825,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 		} catch (AmazonClientException e) {
 			e.printStackTrace();
 		}
+		System.out.println("1: ");
 		return describeInstancesResult.getReservations().get(0);
 	}
 

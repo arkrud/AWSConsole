@@ -19,16 +19,13 @@ import com.amazonaws.services.route53.AmazonRoute53Client;
 import com.arkrud.TableInterface.CustomTable;
 import com.arkrud.UI.OverviewPanel;
 import com.arkrud.UI.Dashboard.Dashboard;
+import com.arkrud.Util.UtilMethodsFactory;
 import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.AwsCommon;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
 public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomAWSObject {
 	private static final long serialVersionUID = 1L;
-	private ResourceRecordSet resourceRecordSet;
-	private String zoneID;
-	private AWSAccount account;
-
 	private static ArrayList<ResourceRecordSet> getResourceRecordSets(AWSAccount account, String zoneID, String appFilter) {
 		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 		ArrayList<ResourceRecordSet> resourceRecordSets = new ArrayList<ResourceRecordSet>();
@@ -37,7 +34,6 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 			ListResourceRecordSetsResult result = route53.listResourceRecordSets(request);
 			List<ResourceRecordSet> recordList = result.getResourceRecordSets();
 			for (ResourceRecordSet record : recordList) {
-				System.out.println(record.getName());
 				if (record.getName().matches(appFilter)) {
 					resourceRecordSets.add(record);
 				}
@@ -48,44 +44,42 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 		}
 		return resourceRecordSets;
 	}
-	
-	
-	private static ArrayList<ResourceRecordSet> getResourceRecordSets(CustomRoute53Zone customRoute53Zone, String appFilter) {
-		
-		System.out.println("here");
+	private static ArrayList<CustomRoute53DNSRecord> getResourceRecordSets(CustomRoute53Zone customRoute53Zone, String appFilter) {
 		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(customRoute53Zone.getAccount().getAccountAlias()));
-		ArrayList<ResourceRecordSet> resourceRecordSets = new ArrayList<ResourceRecordSet>();
+		ArrayList<CustomRoute53DNSRecord> resourceRecordSets = new ArrayList<CustomRoute53DNSRecord>();
 		ListResourceRecordSetsRequest request = new ListResourceRecordSetsRequest().withHostedZoneId(customRoute53Zone.getId());
 		while (true) {
 			ListResourceRecordSetsResult result = route53.listResourceRecordSets(request);
 			List<ResourceRecordSet> recordList = result.getResourceRecordSets();
 			for (ResourceRecordSet record : recordList) {
 				if (record.getName().matches(appFilter)) {
-					
-					System.out.println(record.getName());
-					resourceRecordSets.add(record);
+					resourceRecordSets.add(new CustomRoute53DNSRecord(record));
 				}
 			}
 			if (!result.isTruncated()) {
 				break;
 			}
+			request.setStartRecordName(result.getNextRecordName());
 		}
 		return resourceRecordSets;
 	}
-	
+	private ResourceRecordSet resourceRecordSet;
+
+	private String zoneID;
+
+	private AWSAccount account;
 
 	public CustomRoute53DNSRecord() {
-		
-	}
-	
-	public CustomRoute53DNSRecord(String zoneID) {
-		super();
-		this.zoneID = zoneID;
 	}
 
 	public CustomRoute53DNSRecord(ResourceRecordSet resourceRecordSet) {
 		super();
 		this.resourceRecordSet = resourceRecordSet;
+	}
+
+	public CustomRoute53DNSRecord(String zoneID) {
+		super();
+		this.zoneID = zoneID;
 	}
 
 	@Override
@@ -132,8 +126,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public ImageIcon getAssociatedImage() {
-		// TODO Auto-generated method stub
-		return null;
+		return UtilMethodsFactory.populateInterfaceImages().get("dnsrecordset");
 	}
 
 	@Override
@@ -174,11 +167,9 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public ArrayList<?> getFilteredAWSObjects(AWSAccount account, String appFilter) {
-		return getResourceRecordSets( account, zoneID,  appFilter);
+		return getResourceRecordSets(account, zoneID, appFilter);
 	}
 
-	
-	
 	@Override
 	public ArrayList<?> getFilteredAWSObjects(CustomRoute53Zone customRoute53Zone, String appFilter) {
 		return getResourceRecordSets(customRoute53Zone, appFilter);
@@ -223,7 +214,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return super.getName();
+		return resourceRecordSet.getName();
 	}
 
 	@Override
@@ -300,8 +291,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public String getTreeNodeLeafText() {
-		// TODO Auto-generated method stub
-		return null;
+		return getName();
 	}
 
 	@Override
