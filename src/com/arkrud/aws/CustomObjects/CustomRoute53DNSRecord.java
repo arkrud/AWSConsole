@@ -1,10 +1,12 @@
 package com.arkrud.aws.CustomObjects;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -17,7 +19,9 @@ import com.amazonaws.services.route53.model.ResourceRecord;
 import com.amazonaws.services.route53.model.ResourceRecordSet;
 import com.amazonaws.services.route53.AmazonRoute53Client;
 import com.arkrud.TableInterface.CustomTable;
+import com.arkrud.TreeInterface.CustomTreeContainer;
 import com.arkrud.UI.OverviewPanel;
+import com.arkrud.UI.Dashboard.CustomTableViewInternalFrame;
 import com.arkrud.UI.Dashboard.Dashboard;
 import com.arkrud.Util.UtilMethodsFactory;
 import com.arkrud.aws.AWSAccount;
@@ -26,6 +30,7 @@ import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
 public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomAWSObject {
 	private static final long serialVersionUID = 1L;
+
 	private static ArrayList<ResourceRecordSet> getResourceRecordSets(AWSAccount account, String zoneID, String appFilter) {
 		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 		ArrayList<ResourceRecordSet> resourceRecordSets = new ArrayList<ResourceRecordSet>();
@@ -44,6 +49,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 		}
 		return resourceRecordSets;
 	}
+
 	private static ArrayList<CustomRoute53DNSRecord> getResourceRecordSets(CustomRoute53Zone customRoute53Zone, String appFilter) {
 		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(customRoute53Zone.getAccount().getAccountAlias()));
 		ArrayList<CustomRoute53DNSRecord> resourceRecordSets = new ArrayList<CustomRoute53DNSRecord>();
@@ -63,11 +69,15 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 		}
 		return resourceRecordSets;
 	}
+
 	private ResourceRecordSet resourceRecordSet;
-
 	private String zoneID;
-
 	private AWSAccount account;
+	private String action = "Delete";
+	private String objectNickName = "DNSRecordSet";
+	private String[] recordSetColumnHeaders = { "Record Set Name", "Type", "Value", "TTL" };
+	private JLabel[] recordSetDetailesLabels = { new JLabel("Record Set Name"), new JLabel("Type"), new JLabel("Value"), new JLabel("TTL") };
+	private JLabel[] recordSetAdvancedLabels = { new JLabel("Evaluate target Health"), new JLabel("Helth Check ID"), new JLabel("Region"), new JLabel("Weight"), new JLabel("Geolocation"), new JLabel("Multivalue Answer"), new JLabel("Set ID") };
 
 	public CustomRoute53DNSRecord() {
 	}
@@ -84,44 +94,40 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public String[] defineNodeTreeDropDown() {
-		// TODO Auto-generated method stub
-		return null;
+		String[] menus = { objectNickName + " Properties", UtilMethodsFactory.upperCaseFirst(action) + " " + objectNickName };
+		return menus;
 	}
 
 	@Override
 	public String[] defineTableColumnHeaders() {
-		// TODO Auto-generated method stub
-		return null;
+		return recordSetColumnHeaders;
 	}
 
 	@Override
 	public String[] defineTableMultipleSelectionDropDown() {
-		// TODO Auto-generated method stub
-		return null;
+		String[] menus = { UtilMethodsFactory.upperCaseFirst(action) + " " + objectNickName + "(s)" };
+		return menus;
 	}
 
 	@Override
 	public String[] defineTableSingleSelectionDropDown() {
-		// TODO Auto-generated method stub
-		return null;
+		String[] menus = { objectNickName + " Properties", UtilMethodsFactory.upperCaseFirst(action) + " " + objectNickName + "(s)" };
+		return menus;
 	}
 
 	@Override
 	public AWSAccount getAccount() {
-		// TODO Auto-generated method stub
-		return null;
+		return account;
 	}
 
 	@Override
 	public AliasTarget getAliasTarget() {
-		// TODO Auto-generated method stub
-		return super.getAliasTarget();
+		return resourceRecordSet.getAliasTarget();
 	}
 
 	@Override
 	public ImageIcon getAssociatedContainerImage() {
-		// TODO Auto-generated method stub
-		return null;
+		return UtilMethodsFactory.populateInterfaceImages().get("dnsrecordset-big");
 	}
 
 	@Override
@@ -131,38 +137,50 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public ArrayList<Object> getAWSDetailesPaneData() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Object> summaryData = new ArrayList<Object>();
+		summaryData.add(getName());
+		summaryData.add(getType());
+		summaryData.add(getAliasTarget());
+		summaryData.add(getTTL());
+		return summaryData;
 	}
 
 	@Override
 	public ArrayList<Object> getAWSObjectSummaryData() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Object> summaryData = new ArrayList<Object>();
+		summaryData.add(this);
+		summaryData.add(getType());
+		summaryData.add(getAliasTarget());
+		summaryData.add(getTTL());
+		return summaryData;
+	}
+	
+	public ArrayList<Object> getRecordSetAdvancedPaneData() {
+		ArrayList<Object> summaryData = new ArrayList<Object>();
+		summaryData.add(getType());
+		summaryData.add(getAliasTarget());
+		summaryData.add(getTTL());
+		return summaryData;
 	}
 
 	@Override
 	public ArrayList<ArrayList<Object>> getAWSObjectTagsData() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getDocumentTabHeaders(String paneIdentifier) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getDocumentTabToolTips(String paneIdentifier) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getFailover() {
-		// TODO Auto-generated method stub
-		return super.getFailover();
+		return resourceRecordSet.getFailover();
 	}
 
 	@Override
@@ -177,116 +195,111 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public GeoLocation getGeoLocation() {
-		// TODO Auto-generated method stub
-		return super.getGeoLocation();
+		return resourceRecordSet.getGeoLocation();
 	}
 
 	@Override
 	public String getHealthCheckId() {
-		// TODO Auto-generated method stub
-		return super.getHealthCheckId();
+		return resourceRecordSet.getHealthCheckId();
 	}
 
 	@Override
 	public List<Integer> getkeyEvents() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Integer> events = new ArrayList<Integer>();
+		events.add(KeyEvent.VK_0);
+		events.add(KeyEvent.VK_1);
+		return events;
 	}
 
 	@Override
 	public String getListTabHeaders(String tableIdentifier) {
-		// TODO Auto-generated method stub
-		return null;
+		String[] tableIdentifiers = { objectNickName + " Details", objectNickName + " Advanced" };
+		String[] tablePaneHeaders = { "Detailes", "Advanced" };
+		return UtilMethodsFactory.getListTabsData(tableIdentifier, tableIdentifiers, tablePaneHeaders);
 	}
 
 	@Override
 	public String getListTabToolTips(String tableIdentifier) {
-		// TODO Auto-generated method stub
-		return null;
+		String[] tableIdentifiers = { objectNickName + " Details", objectNickName + " Advanced" };
+		String[] tablePaneToolTips = { objectNickName + " Properties", objectNickName + " Routing & Failover" };
+		return UtilMethodsFactory.getListTabsData(tableIdentifier, tableIdentifiers, tablePaneToolTips);
 	}
 
 	@Override
 	public Boolean getMultiValueAnswer() {
-		// TODO Auto-generated method stub
-		return super.getMultiValueAnswer();
+		return resourceRecordSet.getMultiValueAnswer();
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return resourceRecordSet.getName();
 	}
 
 	@Override
 	public String getObjectAWSID() {
-		// TODO Auto-generated method stub
-		return null;
+		return resourceRecordSet.getSetIdentifier();
 	}
 
 	@Override
 	public String getObjectName() {
-		// TODO Auto-generated method stub
-		return null;
+		return resourceRecordSet.getName();
 	}
 
 	@Override
 	public LinkedHashMap<String[][], String[][][]> getPropertiesPaneTableParams() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public LinkedHashMap<String, String> getpropertiesPaneTabs() {
-		// TODO Auto-generated method stub
-		return null;
+		LinkedHashMap<String, String> summaryDataPaneTabs = new LinkedHashMap<String, String>();
+		summaryDataPaneTabs.put(objectNickName + " Details", "ListInfoPane");
+		summaryDataPaneTabs.put(objectNickName + " Advanced", "ListInfoPane");
+		return summaryDataPaneTabs;
 	}
 
 	@Override
 	public String getpropertiesPaneTitle() {
-		// TODO Auto-generated method stub
-		return null;
+		return objectNickName + " Properties for " + getName() + " under " + getAccount().getAccountAlias() + " account";
 	}
 
 	@Override
 	public ArrayList<Integer> getPropertyPanelsFieldsCount() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Integer> propertyPanelsFieldsCount = new ArrayList<Integer>();
+		propertyPanelsFieldsCount.add(recordSetDetailesLabels.length);
+		propertyPanelsFieldsCount.add(recordSetAdvancedLabels.length);
+		return propertyPanelsFieldsCount;
 	}
 
 	@Override
 	public String getRegion() {
 		// TODO Auto-generated method stub
-		return super.getRegion();
+		return resourceRecordSet.getRegion();
 	}
 
 	@Override
 	public List<ResourceRecord> getResourceRecords() {
-		// TODO Auto-generated method stub
-		return super.getResourceRecords();
+		return resourceRecordSet.getResourceRecords();
 	}
 
 	@Override
 	public String getSetIdentifier() {
-		// TODO Auto-generated method stub
-		return super.getSetIdentifier();
+		return resourceRecordSet.getSetIdentifier();
 	}
 
 	@Override
 	public String getTableTabHeaders(String tableIdentifier) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getTableTabToolTips(String tableIdentifier) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getTrafficPolicyInstanceId() {
-		// TODO Auto-generated method stub
-		return super.getTrafficPolicyInstanceId();
+		return resourceRecordSet.getTrafficPolicyInstanceId();
 	}
 
 	@Override
@@ -296,46 +309,53 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public Long getTTL() {
-		// TODO Auto-generated method stub
-		return super.getTTL();
+		return resourceRecordSet.getTTL();
 	}
 
 	@Override
 	public String getType() {
-		// TODO Auto-generated method stub
-		return super.getType();
+		return resourceRecordSet.getType();
 	}
 
 	@Override
 	public Long getWeight() {
-		// TODO Auto-generated method stub
-		return super.getWeight();
+		return resourceRecordSet.getWeight();
 	}
 
 	@Override
 	public Boolean isMultiValueAnswer() {
-		// TODO Auto-generated method stub
-		return super.isMultiValueAnswer();
+		return resourceRecordSet.isMultiValueAnswer();
 	}
 
 	@Override
 	public void performTableActions(CustomAWSObject object, JScrollableDesktopPane jScrollableDesktopPan, CustomTable table, String actionString) {
-		// TODO Auto-generated method stub
+		if (actionString.contains(action)) {
+		} else if (actionString.contains(objectNickName + " Properties")) {
+			UtilMethodsFactory.showFrame(object, jScrollableDesktopPan);
+		}
 	}
 
 	@Override
 	public void performTreeActions(CustomAWSObject object, DefaultMutableTreeNode node, JTree tree, Dashboard dash, String actionString) {
-		// TODO Auto-generated method stub
+		DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
+		setAccount(((CustomTreeContainer) parentNode.getUserObject()).getAccount());
+		if (actionString.equals(objectNickName.toUpperCase() + " PROPERTIES")) {
+			UtilMethodsFactory.showFrame(node.getUserObject(), dash.getJScrollableDesktopPane());
+		} else if (actionString.equals(action.toUpperCase() + " " + objectNickName.toUpperCase())) {
+		}
 	}
 
 	@Override
 	public void populateAWSObjectPrpperties(OverviewPanel overviewPanel, CustomAWSObject object, String paneName) {
-		// TODO Auto-generated method stub
+		if (paneName.equals(objectNickName + " Details")) {
+			overviewPanel.getDetailesData(object, object.getAccount(), recordSetDetailesLabels, paneName);
+		} else if (paneName.equals(objectNickName + " Advanced")) {
+			overviewPanel.getDetailesData(object, object.getAccount(), recordSetAdvancedLabels, paneName);
+		}
 	}
 
 	@Override
 	public void remove() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -345,6 +365,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public void showDetailesFrame(AWSAccount account, CustomAWSObject customAWSObject, JScrollableDesktopPane jScrollableDesktopPan) {
-		// TODO Auto-generated method stub
+		CustomTableViewInternalFrame theFrame = new CustomTableViewInternalFrame(getpropertiesPaneTitle(), UtilMethodsFactory.generateEC2ObjectPropertiesPane(customAWSObject, jScrollableDesktopPan));
+		UtilMethodsFactory.addInternalFrameToScrolableDesctopPane(getpropertiesPaneTitle(), jScrollableDesktopPan, theFrame);
 	}
 }

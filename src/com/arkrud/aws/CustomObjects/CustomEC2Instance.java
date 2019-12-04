@@ -82,15 +82,18 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	public String[] instancesTableColumnHeaders = { "Instance Name", "Instance ID", "Instance Type", "Availability Zone", "Instance State", "Alarm Status", "Launch Time" };
 
 	public CustomEC2Instance(Instance instance) {
+		System.out.println("111");
 		this.instance = instance;
 	}
 
 	public CustomEC2Instance(AWSAccount account, String id) {
+		System.out.println("222");
 		this.instance = retriveOneEC2Instance(account, id);
 		this.account = account;
 	}
 
 	public CustomEC2Instance(AWSAccount account, String id, boolean filtered, String appFilter) {
+		System.out.println("333");
 		List<CustomEC2Instance> object = retriveEC2Instances(account, filtered, appFilter);
 		Iterator<CustomEC2Instance> iterator = object.iterator();
 		while (iterator.hasNext()) {
@@ -103,7 +106,9 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	}
 
 	public CustomEC2Instance() {
+		
 		super();
+		System.out.println("444");
 	}
 
 	@Override
@@ -253,7 +258,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 		summaryData.add(getInstanceScheduledEents(account, getInstanceId()));
 		summaryData.add(lifeCycle);
 		summaryData.add(getMonitoring().getState());
-		//summaryData.add(getAlarmStateForInstance(getAccount(), getInstanceId()));
+		// summaryData.add(getAlarmStateForInstance(getAccount(), getInstanceId()));
 		summaryData.add(" - ");
 		summaryData.add(platform);
 		summaryData.add(kernelId);
@@ -665,6 +670,11 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	}
 
 	private String getAlarmStateForInstance(AWSAccount account, String instanceId) {
+		return "Not implementted";
+	}
+	
+	private String getAlarmStateForInstanceSlow(AWSAccount account, String instanceId) {
+		System.out.println("Strat long method");
 		String alarmStatValue = "No Alarms Set";
 		AmazonCloudWatchClient amazonCloudWatchClient = new AmazonCloudWatchClient(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 		ListMetricsRequest listMetricsRequest = new ListMetricsRequest();
@@ -700,6 +710,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 				}
 			}
 		}
+		System.out.println("End long method");
 		return alarmStatValue;
 	}
 
@@ -755,10 +766,12 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 		return instances;
 	}
 
-	public static CustomEC2Instance retriveOneEC2Instance(AWSAccount account,  String id) {
+	private ArrayList<CustomEC2Instance> retriveEC2InstancesFilter(AWSAccount account, boolean filtered, String appFilter) {
+		System.out.println("!!!!!!!!!!!!!");
+		ArrayList<CustomEC2Instance> instances = new ArrayList<CustomEC2Instance>();
 		DescribeInstancesResult describeInstancesResult = null;
-		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
-
+		DescribeInstancesRequest request = new DescribeInstancesRequest().withFilters(new Filter("tag:" + "Services").withValues("alerter"));
+		System.out.println("5: " + appFilter);
 		try {
 			AmazonEC2 client = EC2Common.connectToEC2(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 			client.setRegion(account.getAccontRegionObject());
@@ -771,22 +784,48 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 		CustomEC2Instance customInstance = null;
 		Iterator<Reservation> ec2Reservations = describeInstancesResult.getReservations().iterator();
 		while (ec2Reservations.hasNext()) {
+			Reservation reservation = ec2Reservations.next();
+			Iterator<Instance> instanceIterator = reservation.getInstances().iterator();
+			while (instanceIterator.hasNext()) {
+				Instance instance = instanceIterator.next();
+				customInstance = new CustomEC2Instance(instance);
+				customInstance.setAccount(account);
+				instances.add(customInstance);
+				System.out.println("5: " + instance.getInstanceId());
+			}
+		}
+		return instances;
+	}
 
+	public static CustomEC2Instance retriveOneEC2Instance(AWSAccount account, String id) {
+		DescribeInstancesResult describeInstancesResult = null;
+		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
+		try {
+			AmazonEC2 client = EC2Common.connectToEC2(AwsCommon.getAWSCredentials(account.getAccountAlias()));
+			client.setRegion(account.getAccontRegionObject());
+			describeInstancesResult = client.describeInstances(request);
+		} catch (AmazonServiceException e) {
+			e.printStackTrace();
+		} catch (AmazonClientException e) {
+			e.printStackTrace();
+		}
+		CustomEC2Instance customInstance = null;
+		Iterator<Reservation> ec2Reservations = describeInstancesResult.getReservations().iterator();
+		while (ec2Reservations.hasNext()) {
 			Reservation reservation = ec2Reservations.next();
 			Iterator<Instance> instanceIterator = reservation.getInstances().iterator();
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
 				customInstance = new CustomEC2Instance(instance);
 				System.out.println("5: " + instance.getInstanceId());
-		}
+			}
 		}
 		return customInstance;
 	}
 
-	public static CustomEC2Instance retriveEC2Instance(AWSAccount account,  String id) {
+	public static CustomEC2Instance retriveEC2Instance(AWSAccount account, String id) {
 		DescribeInstancesResult describeInstancesResult = null;
 		DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
-
 		try {
 			AmazonEC2 client = EC2Common.connectToEC2(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 			client.setRegion(account.getAccontRegionObject());
@@ -799,16 +838,13 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 		CustomEC2Instance customInstance = null;
 		Iterator<Reservation> ec2Reservations = describeInstancesResult.getReservations().iterator();
 		while (ec2Reservations.hasNext()) {
-
 			Reservation reservation = ec2Reservations.next();
 			Iterator<Instance> instanceIterator = reservation.getInstances().iterator();
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
 				System.out.println(instance.getInstanceId());
-				
 				customInstance = new CustomEC2Instance(instance);
-
-		}
+			}
 		}
 		return customInstance;
 	}

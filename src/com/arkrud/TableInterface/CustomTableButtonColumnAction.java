@@ -79,7 +79,12 @@ public class CustomTableButtonColumnAction extends AbstractAction implements Pro
 			int realRowIndex = table.convertRowIndexToModel(table.getSelectedRow());
 			int realcolumnIndex = table.convertColumnIndexToModel(table.getSelectedColumn());
 			LinkLikeButton linkLikeButton = (LinkLikeButton) table.getModel().getValueAt(realRowIndex, realcolumnIndex);
-			CustomEC2Instance customEC2Instance = new CustomEC2Instance(((CustomEC2TargetGroup) table.getDataObject()).getAccount(), linkLikeButton.getText());
+			CustomEC2Instance customEC2Instance = null;
+			if (table.getDataObject() instanceof CustomEC2TargetGroup) {
+				customEC2Instance = new CustomEC2Instance(((CustomEC2TargetGroup) table.getDataObject()).getAccount(), linkLikeButton.getText());
+			} else if (table.getDataObject() instanceof CustomTreeContainer) {
+				customEC2Instance = new CustomEC2Instance(((CustomTreeContainer) table.getDataObject()).getAccount(), linkLikeButton.getText());
+			}
 			UtilMethodsFactory.showFrame(customEC2Instance, jScrollableDesktopPan);
 		} else if (usageFlag.equals("Target Group")) {
 			int realRowIndex = table.convertRowIndexToModel(table.getSelectedRow());

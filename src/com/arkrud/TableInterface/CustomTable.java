@@ -223,6 +223,7 @@ public class CustomTable extends JTable {
 	}
 
 	private void createButtonLikeColums(JScrollableDesktopPane jScrollableDesktopPan) {
+		System.out.println("tableUsageIdentifier: " +  tableUsageIdentifier); 
 		if (tableUsageIdentifier.equals("CustomEC2SecurityGroup") || tableUsageIdentifier.equals("ELBSecurityGroupsList")) {
 			ArrayList<String> tagsTableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.tagsTableColumnHeaders));
 			ButtonColumn buttonTagColumn = new ButtonColumn(this,
@@ -250,6 +251,10 @@ public class CustomTable extends JTable {
 		} else if (tableUsageIdentifier.equals("ELBInstances")) {
 			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instances"),
 					0);
+			instanceColumn.setMnemonic(KeyEvent.VK_D);
+		} else if (tableUsageIdentifier.equals("CustomEC2Instance")) {
+			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instance ID"),
+					1);
 			instanceColumn.setMnemonic(KeyEvent.VK_D);
 		} else if (tableUsageIdentifier.equals("TargetGroupTargets")) {
 			ButtonColumn instanceColumn = new ButtonColumn(this,

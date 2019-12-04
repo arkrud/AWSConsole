@@ -163,6 +163,10 @@ public class OverviewPanel extends JPanel {
 			customEC2TargetGroup = (CustomEC2TargetGroup) awsObject;
 			properties = customEC2TargetGroup.getHealthCheckPaneData();
 			break;
+		case "DNSRecordSetAdvanced":
+			customEC2TargetGroup = (CustomEC2TargetGroup) awsObject;
+			properties = customEC2TargetGroup.getHealthCheckPaneData();
+			break;
 		default:
 			properties = ((CustomAWSObject) awsObject).getAWSDetailesPaneData();
 			break;

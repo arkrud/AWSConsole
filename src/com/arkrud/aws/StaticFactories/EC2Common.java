@@ -27,6 +27,7 @@ import com.arkrud.TreeInterface.CustomTreeContainer;
 import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.AwsCommon;
 import com.arkrud.aws.CustomObjects.CustomAWSObject;
+import com.arkrud.aws.CustomObjects.CustomEC2Instance;
 
 public class EC2Common {
 	// Connect to EC2
@@ -252,7 +253,13 @@ public class EC2Common {
 		ArrayList<ArrayList<Object>> data = new ArrayList<ArrayList<Object>>();
 		for (int i = 0; i < container.getEc2Objects().size(); i++) {
 			CustomAWSObject awsObject = (CustomAWSObject) container.getEc2Objects().get(i);
-			ArrayList<Object> awsObjectData = awsObject.getAWSObjectSummaryData();
+			ArrayList<Object> awsObjectData = null;
+			if (awsObject instanceof CustomEC2Instance) {
+				awsObjectData = awsObject.getAWSObjectSummaryData();
+			} else {
+				awsObjectData = awsObject.getAWSObjectSummaryData();
+			}
+			
 			data.add(awsObjectData);
 		}
 		return data;

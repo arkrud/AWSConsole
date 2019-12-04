@@ -596,6 +596,7 @@ public class UtilMethodsFactory {
 	}
 
 	public static CustomTableViewInternalFrame showFrame(Object nodeObject, JScrollableDesktopPane jScrollableDesktopPan) {
+		System.out.println("isnull? " + nodeObject);
 		String frameTitle = ((CustomAWSObject) nodeObject).getpropertiesPaneTitle();
 		PropertiesTabbedPane propertiesTabbedPane = generateEC2ObjectPropertiesPane(nodeObject, jScrollableDesktopPan);
 		CustomTableViewInternalFrame theFrame = new CustomTableViewInternalFrame(frameTitle, propertiesTabbedPane);
