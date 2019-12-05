@@ -29,7 +29,7 @@ import com.arkrud.aws.CustomObjects.CustomEC2ELB;
 import com.arkrud.aws.CustomObjects.CustomEC2ELBV2;
 import com.arkrud.aws.CustomObjects.CustomEC2SecurityGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
-import com.arkrud.aws.CustomObjects.CustomRoute53DNSRecord;
+import com.arkrud.aws.CustomObjects.CustomRoute53Zone;
 import com.arkrud.aws.StaticFactories.EC2Common;
 import com.arkrud.aws.StaticFactories.S3Common;
 
@@ -159,6 +159,9 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 			data = ((CustomEC2TargetGroup) tableObject).getTGTargetsAZsData();
 		} else if (tableIdentifier.equals("TargetGroupAttributes")) {
 			data = ((CustomEC2TargetGroup) tableObject).getTGAttributesData();
+		} else if (tableIdentifier.equals("CustomRoute53Zone")) {
+			System.out.println("Count: " + ((CustomRoute53Zone) tableObject).getCustomRoute53ZoneTreeNode().getChildCount());
+			data = ((CustomRoute53Zone) tableObject).getRoute53ZonesRecordsData(((CustomRoute53Zone) tableObject).getCustomRoute53ZoneTreeNode());
 		} else if (tableIdentifier.equals("Tags")) {
 			data = ((CustomAWSObject) tableObject).getAWSObjectTagsData();
 		} else {

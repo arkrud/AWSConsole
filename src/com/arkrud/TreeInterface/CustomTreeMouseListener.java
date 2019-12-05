@@ -30,6 +30,7 @@ import com.arkrud.aws.AWSService;
 import com.arkrud.aws.AwsCommon;
 import com.arkrud.aws.S3Folder;
 import com.arkrud.aws.CustomObjects.CustomAWSObject;
+import com.arkrud.aws.CustomObjects.CustomRoute53Zone;
 import com.arkrud.aws.StaticFactories.EC2Common;
 import com.tomtessier.scrollabledesktop.BaseInternalFrame;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
@@ -154,6 +155,12 @@ public class CustomTreeMouseListener implements MouseListener, PropertyChangeLis
 					String[] headers = ((CustomTreeContainer) obj).getObjectTableColumnHeaders();
 					// UtilMethodsFactory.retriveEC2NetworkInterfaces(((CustomTreeContainer) obj).getAccount());
 					showTable(obj, pane, path, objectIdentifier, headers);
+				} else if (obj instanceof CustomRoute53Zone) {
+					String objectIdentifier = obj.getClass().getSimpleName();
+					String[] recordSetColumnHeaders = { "Record Set Name", "Type", "Value", "TTL" };
+					((CustomRoute53Zone) obj).setCustomRoute53ZoneTreeNode((DefaultMutableTreeNode) path.getLastPathComponent());
+					showTable(obj, pane, path, objectIdentifier, recordSetColumnHeaders);
+					
 				} else {
 				}
 			}
@@ -162,18 +169,30 @@ public class CustomTreeMouseListener implements MouseListener, PropertyChangeLis
 	}
 
 	private void showTable(Object obj, JScrollableDesktopPane pane, TreePath path, String tableIdentifier, String[] columnHeaders) {
-		final CustomProgressBar progFrame = new CustomProgressBar(true, false, "Retrieving Instances Info");
+		System.out.println("Intermidiats");
+		/*final CustomProgressBar progFrame = new CustomProgressBar(true, false, "Retrieving Instances Info");
 		progFrame.getPb().setIndeterminate(true);
 		SwingWorker<Void, Void> w = new SwingWorker<Void, Void>() {
 			@Override
 			protected Void doInBackground() throws Exception {
-				String frameTitle = ((CustomTreeContainer) obj).getContainerName() + " For " + ((CustomTreeContainer) obj).getAccount().getAccountAlias();
+				
+				String frameTitle = "";
+				if (obj instanceof CustomTreeContainer) {
+					frameTitle = ((CustomTreeContainer) obj).getContainerName() + " For " + ((CustomTreeContainer) obj).getAccount().getAccountAlias();					
+				} else if (obj instanceof CustomRoute53Zone) {
+					
+					frameTitle = ((CustomRoute53Zone) obj).getName() + " For " + ((CustomRoute53Zone) obj).getAccount().getAccountAlias();
+					System.out.println("frameTitle: " +  frameTitle);
+				}
 				ArrayList<String> tableColumnHeaders = new ArrayList<String>(Arrays.asList(columnHeaders));
+				
 				CustomTable table = new CustomTable(obj, tableColumnHeaders, pane, tableIdentifier, false);
+				System.out.println("table Ready to open");
 				table.setParentTreeNode((DefaultMutableTreeNode) path.getLastPathComponent());
 				table.setTree(tree);
 				table.setDash(dash);
 				table.setAwsAccount(((CustomTreeContainer) obj).getAccount());
+				
 				BaseInternalFrame theFrame = new CustomTableViewInternalFrame(frameTitle, table);
 				UtilMethodsFactory.addInternalFrameToScrolableDesctopPane(frameTitle, pane, theFrame);
 				return null;
@@ -188,7 +207,33 @@ public class CustomTreeMouseListener implements MouseListener, PropertyChangeLis
 		};
 		w.addPropertyChangeListener(this);
 		w.execute();
-		progFrame.setVisible(true);
+		progFrame.setVisible(true);*/
+		
+		
+		String frameTitle = "";
+		if (obj instanceof CustomTreeContainer) {
+			frameTitle = ((CustomTreeContainer) obj).getContainerName() + " For " + ((CustomTreeContainer) obj).getAccount().getAccountAlias();					
+		} else if (obj instanceof CustomRoute53Zone) {
+			
+			frameTitle = ((CustomRoute53Zone) obj).getName() + " For " + ((CustomRoute53Zone) obj).getAccount().getAccountAlias();
+			System.out.println("frameTitle: " +  frameTitle);
+		}
+		ArrayList<String> tableColumnHeaders = new ArrayList<String>(Arrays.asList(columnHeaders));
+		
+		CustomTable table = new CustomTable(obj, tableColumnHeaders, pane, tableIdentifier, false);
+		System.out.println("table Ready to open");
+		table.setParentTreeNode((DefaultMutableTreeNode) path.getLastPathComponent());
+		table.setTree(tree);
+		table.setDash(dash);
+		if (obj instanceof CustomTreeContainer) {
+		table.setAwsAccount(((CustomTreeContainer) obj).getAccount());
+		} else if  (obj instanceof CustomRoute53Zone) { 
+			table.setAwsAccount(((CustomRoute53Zone) obj).getAccount());
+		}
+		BaseInternalFrame theFrame = new CustomTableViewInternalFrame(frameTitle, table);
+		UtilMethodsFactory.addInternalFrameToScrolableDesctopPane(frameTitle, pane, theFrame);
+		
+		
 	}
 
 	public Point getLoc() {

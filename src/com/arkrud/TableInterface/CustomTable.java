@@ -60,6 +60,7 @@ import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2Volume;
 import com.arkrud.aws.CustomObjects.CustomIAMInstanceProfile;
 import com.arkrud.aws.CustomObjects.CustomRegionObject;
+import com.arkrud.aws.CustomObjects.CustomRoute53Zone;
 import com.arkrud.aws.StaticFactories.EC2Common;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
@@ -106,6 +107,7 @@ public class CustomTable extends JTable {
 	public CustomTable(Object dataObject, ArrayList<String> columnHeaders, JScrollableDesktopPane jScrollableDesktopPan, String tableUsageIdentifier,
 			boolean editable) {
 		super();
+		
 		// Variable reassignment to use constructor parameter in class methods
 		this.tableUsageIdentifier = tableUsageIdentifier;
 		this.dataObject = dataObject;
@@ -124,7 +126,7 @@ public class CustomTable extends JTable {
 		setRowSorter(myModelSorter);
 		// Apply model to the table
 		setModel(model);
-	
+		System.out.println("Boomww");
 		
 		// Configure table interface options
 		setPreferredScrollableViewportSize(getPreferredSize());
@@ -164,15 +166,24 @@ public class CustomTable extends JTable {
 	}
 
 	private void populateModelData(CustomTableModel model) {
-		if (dataObject instanceof CustomTreeContainer) {
-			model.generateTableData(((CustomTreeContainer) dataObject).getAccount(), dataObject, tableUsageIdentifier);
-			awsAccount = ((CustomTreeContainer) dataObject).getAccount();
-		} else if (dataObject instanceof CustomAWSObject) {
-			model.generateTableData(((CustomAWSObject) dataObject).getAccount(), dataObject, tableUsageIdentifier);
-			awsAccount = ((CustomAWSObject) dataObject).getAccount();
+		System.out.println("ddd " + dataObject.getClass().getSimpleName());
+		if (dataObject instanceof CustomRoute53Zone ) {
+			System.out.println("Another boom");
+			model.generateTableData(((CustomRoute53Zone) dataObject).getAccount(), dataObject, tableUsageIdentifier);
+			awsAccount = ((CustomRoute53Zone) dataObject).getAccount();
 		} else {
-			model.generateTableData(null, dataObject, tableUsageIdentifier);
+			if (dataObject instanceof CustomTreeContainer) {
+				model.generateTableData(((CustomTreeContainer) dataObject).getAccount(), dataObject, tableUsageIdentifier);
+				awsAccount = ((CustomTreeContainer) dataObject).getAccount();
+			} else if (dataObject instanceof CustomAWSObject) {
+				model.generateTableData(((CustomAWSObject) dataObject).getAccount(), dataObject, tableUsageIdentifier);
+				awsAccount = ((CustomAWSObject) dataObject).getAccount();
+			} else {
+				model.generateTableData(null, dataObject, tableUsageIdentifier);
+			}
 		}
+		
+		
 	}
 
 	private void createComboBoxSelectorColumns() {
