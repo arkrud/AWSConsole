@@ -150,16 +150,20 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 		ArrayList<Object> summaryData = new ArrayList<Object>();
 		summaryData.add(this);
 		summaryData.add(getType());
-		summaryData.add(getAliasTarget());
+		summaryData.add(getAliasTarget().getDNSName());
 		summaryData.add(getTTL());
 		return summaryData;
 	}
 	
 	public ArrayList<Object> getRecordSetAdvancedPaneData() {
 		ArrayList<Object> summaryData = new ArrayList<Object>();
-		summaryData.add(getType());
-		summaryData.add(getAliasTarget());
-		summaryData.add(getTTL());
+		summaryData.add(getAliasTarget().getEvaluateTargetHealth());
+		summaryData.add(getHealthCheckId());
+		summaryData.add(getRegion());
+		summaryData.add(getWeight());
+		summaryData.add(getGeoLocation());
+		summaryData.add(getMultiValueAnswer());
+		summaryData.add(getSetIdentifier());
 		return summaryData;
 	}
 

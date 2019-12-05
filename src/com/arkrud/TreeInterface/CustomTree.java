@@ -568,6 +568,7 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 				((CustomIAMInstanceProfile) obj).setAccount(account);
 			} else if (obj instanceof CustomRoute53Zone) {
 				((CustomRoute53Zone) obj).setAccount(account);
+				
 			}
 			customObjectNode = new DefaultMutableTreeNode(obj);
 			containerNode.add(customObjectNode);

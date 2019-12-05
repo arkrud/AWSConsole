@@ -27,6 +27,7 @@ import com.amazonaws.services.route53.model.ResourceRecordSet;
 import com.amazonaws.services.route53.model.Tag;
 import com.arkrud.TableInterface.CustomTable;
 import com.arkrud.TreeInterface.CustomTreeContainer;
+import com.arkrud.TreeInterface.TreeNodeState;
 import com.arkrud.UI.OverviewPanel;
 import com.arkrud.UI.Dashboard.CustomTableViewInternalFrame;
 import com.arkrud.UI.Dashboard.Dashboard;
@@ -35,7 +36,7 @@ import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.AwsCommon;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
-public class CustomRoute53Zone extends HostedZone implements CustomAWSObject {
+public class CustomRoute53Zone extends HostedZone implements CustomAWSObject, TreeNodeState {
 	private static final long serialVersionUID = 1L;
 
 	public static ArrayList<CustomRoute53Zone> getRoute53Zones(AWSAccount account, String appFilter) {
@@ -313,7 +314,6 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject {
 
 	@Override
 	public void remove() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -340,5 +340,41 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject {
 			JOptionPane.showMessageDialog(theFrame, "This " + objectNickName + " is Alredy Deregistered", objectNickName + " Gone",
 					JOptionPane.WARNING_MESSAGE);
 		}
+	}
+
+	@Override
+	public String getNodeText() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getNodeScreenName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isSelected() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setSelected(boolean selected) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getAWSAccountAlias() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setAWSAccountAlias(String accountAlias) {
+		// TODO Auto-generated method stub
+		
 	}
 }

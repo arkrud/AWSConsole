@@ -29,6 +29,7 @@ import com.arkrud.aws.CustomObjects.CustomEC2ELB;
 import com.arkrud.aws.CustomObjects.CustomEC2ELBV2;
 import com.arkrud.aws.CustomObjects.CustomEC2SecurityGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
+import com.arkrud.aws.CustomObjects.CustomRoute53DNSRecord;
 import com.arkrud.aws.StaticFactories.EC2Common;
 import com.arkrud.aws.StaticFactories.S3Common;
 
