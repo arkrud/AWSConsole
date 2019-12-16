@@ -11,15 +11,14 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.amazonaws.services.route53.AmazonRoute53;
+import com.amazonaws.services.route53.AmazonRoute53Client;
 import com.amazonaws.services.route53.model.AliasTarget;
 import com.amazonaws.services.route53.model.GeoLocation;
 import com.amazonaws.services.route53.model.ListResourceRecordSetsRequest;
 import com.amazonaws.services.route53.model.ListResourceRecordSetsResult;
 import com.amazonaws.services.route53.model.ResourceRecord;
 import com.amazonaws.services.route53.model.ResourceRecordSet;
-import com.amazonaws.services.route53.AmazonRoute53Client;
 import com.arkrud.TableInterface.CustomTable;
-import com.arkrud.TreeInterface.CustomTreeContainer;
 import com.arkrud.UI.OverviewPanel;
 import com.arkrud.UI.Dashboard.CustomTableViewInternalFrame;
 import com.arkrud.UI.Dashboard.Dashboard;
@@ -77,7 +76,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	private String objectNickName = "DNSRecordSet";
 	private String[] recordSetColumnHeaders = { "Record Set Name", "Type", "Value", "TTL" };
 	private JLabel[] recordSetDetailesLabels = { new JLabel("Record Set Name"), new JLabel("Type"), new JLabel("Value"), new JLabel("TTL") };
-	private JLabel[] recordSetAdvancedLabels = { new JLabel("Evaluate target Health"), new JLabel("Helth Check ID"), new JLabel("Region"), new JLabel("Weight"), new JLabel("Geolocation"), new JLabel("Multivalue Answer"), new JLabel("Set ID") };
+	private JLabel[] recordSetAdvancedLabels = { new JLabel("Evaluate target Health"), new JLabel("Helth Check ID"), new JLabel("Region"), new JLabel("Weight"), new JLabel("Geolocation"), new JLabel("Multivalue Answer"), new JLabel("Set ID"), new JLabel("Failover"), new JLabel("Traffic Policy Instance Id")  };
 
 	public CustomRoute53DNSRecord() {
 	}
@@ -140,7 +139,17 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 		ArrayList<Object> summaryData = new ArrayList<Object>();
 		summaryData.add(getName());
 		summaryData.add(getType());
-		summaryData.add(getAliasTarget());
+		if (getResourceRecords().size() > 0 ) {
+			summaryData.add(getResourceRecords().get(0).getValue());
+			
+		} else {
+			if (getAliasTarget() != null) {
+				summaryData.add("ALIAS " + getAliasTarget().getDNSName());
+			} else {
+				summaryData.add(" - ");
+			}
+			
+		}
 		summaryData.add(getTTL());
 		return summaryData;
 	}
@@ -150,20 +159,39 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 		ArrayList<Object> summaryData = new ArrayList<Object>();
 		summaryData.add(this);
 		summaryData.add(getType());
-		summaryData.add(getAliasTarget().getDNSName());
+		if (getResourceRecords().size() > 0 ) {
+			summaryData.add(getResourceRecords().get(0).getValue());
+			
+		} else {
+			if (getAliasTarget() != null) {
+				summaryData.add("ALIAS " + getAliasTarget().getDNSName());
+			} else {
+				summaryData.add(" - ");
+			}
+			
+		}
 		summaryData.add(getTTL());
 		return summaryData;
 	}
 	
 	public ArrayList<Object> getRecordSetAdvancedPaneData() {
 		ArrayList<Object> summaryData = new ArrayList<Object>();
-		summaryData.add(getAliasTarget().getEvaluateTargetHealth());
+		if (getAliasTarget() != null) {
+			summaryData.add(getAliasTarget().getEvaluateTargetHealth());
+		} else {
+			summaryData.add(" - ");
+		}
+		
 		summaryData.add(getHealthCheckId());
 		summaryData.add(getRegion());
 		summaryData.add(getWeight());
 		summaryData.add(getGeoLocation());
 		summaryData.add(getMultiValueAnswer());
 		summaryData.add(getSetIdentifier());
+		summaryData.add(getFailover());
+		summaryData.add(getTrafficPolicyInstanceId());
+		
+		
 		return summaryData;
 	}
 
@@ -342,7 +370,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	@Override
 	public void performTreeActions(CustomAWSObject object, DefaultMutableTreeNode node, JTree tree, Dashboard dash, String actionString) {
 		DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
-		setAccount(((CustomTreeContainer) parentNode.getUserObject()).getAccount());
+		setAccount(((CustomRoute53Zone) parentNode.getUserObject()).getAccount());
 		if (actionString.equals(objectNickName.toUpperCase() + " PROPERTIES")) {
 			UtilMethodsFactory.showFrame(node.getUserObject(), dash.getJScrollableDesktopPane());
 		} else if (actionString.equals(action.toUpperCase() + " " + objectNickName.toUpperCase())) {

@@ -156,7 +156,7 @@ public class CustomTreeMouseListener implements MouseListener, PropertyChangeLis
 					// UtilMethodsFactory.retriveEC2NetworkInterfaces(((CustomTreeContainer) obj).getAccount());
 					showTable(obj, pane, path, objectIdentifier, headers);
 				} else if (obj instanceof CustomRoute53Zone) {
-					String objectIdentifier = obj.getClass().getSimpleName();
+					String objectIdentifier = obj.getClass().getSimpleName() + "Records";
 					String[] recordSetColumnHeaders = { "Record Set Name", "Type", "Value", "TTL" };
 					((CustomRoute53Zone) obj).setCustomRoute53ZoneTreeNode((DefaultMutableTreeNode) path.getLastPathComponent());
 					showTable(obj, pane, path, objectIdentifier, recordSetColumnHeaders);

@@ -159,8 +159,7 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 			data = ((CustomEC2TargetGroup) tableObject).getTGTargetsAZsData();
 		} else if (tableIdentifier.equals("TargetGroupAttributes")) {
 			data = ((CustomEC2TargetGroup) tableObject).getTGAttributesData();
-		} else if (tableIdentifier.equals("CustomRoute53Zone")) {
-			System.out.println("Count: " + ((CustomRoute53Zone) tableObject).getCustomRoute53ZoneTreeNode().getChildCount());
+		} else if (tableIdentifier.equals("CustomRoute53ZoneRecords")) {
 			data = ((CustomRoute53Zone) tableObject).getRoute53ZonesRecordsData(((CustomRoute53Zone) tableObject).getCustomRoute53ZoneTreeNode());
 		} else if (tableIdentifier.equals("Tags")) {
 			data = ((CustomAWSObject) tableObject).getAWSObjectTagsData();

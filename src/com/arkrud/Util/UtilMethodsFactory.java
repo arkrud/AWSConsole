@@ -84,7 +84,7 @@ public class UtilMethodsFactory {
 			"Add Security Group", "Delete Security Group", "Security Group Properties", "Create CF Stack", "Delete CF Stack", "Stack Properties", "Update CF Stack", "Create ELB", "ELB Properties", "ELBV2 Properties", "Instance Properties",
 			"Delete ELB", "AMI Properties", "Deregister AMI", "Refresh", "Create Instance", "Delete Snapshot", "Snapshot Properties", "Instance Profile Properties", "Delete Instance Profile", "IAM Role Properties", "Delete IAM Role",
 			"Delete AutoScaling Group", "AutoScaling Group Properties", "Create AutoScaling Group", "Launch Configuration Properties", "Copy Launch Configuration", "Volume Properties", "Delete Volume", "Delete KeyPair", "Add Filter", "Delete Filter",
-			"Network Interface Properties", "Delete Network Interface" , "TargetGroup Properties", "Hosted Zone Properties" };
+			"Network Interface Properties", "Delete Network Interface" , "TargetGroup Properties", "Hosted Zone Properties", "DNSRecordSet Properties" };
 	public static String[] securityGroupsRulesTableColumnHeaders = { "Rule Type", "Protocol", "Port Range", "Source Type", "Range" };
 	public static String[] elbv2ListenerRulesTableColumnHeaders = { "ARN", "Default", "Priority", "Rules Actions", "Rules Conditions" };
 	private static String[] awsAccountsTableColumnHeaders = { "Account", "aws_access_key_id", "aws_secret_access_key", "Region" };

@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import com.amazonaws.services.route53.AmazonRoute53;
 import com.amazonaws.services.route53.AmazonRoute53Client;
@@ -20,11 +19,8 @@ import com.amazonaws.services.route53.model.HostedZoneConfig;
 import com.amazonaws.services.route53.model.LinkedService;
 import com.amazonaws.services.route53.model.ListHostedZonesRequest;
 import com.amazonaws.services.route53.model.ListHostedZonesResult;
-import com.amazonaws.services.route53.model.ListResourceRecordSetsRequest;
-import com.amazonaws.services.route53.model.ListResourceRecordSetsResult;
 import com.amazonaws.services.route53.model.ListTagsForResourceRequest;
 import com.amazonaws.services.route53.model.ListTagsForResourceResult;
-import com.amazonaws.services.route53.model.ResourceRecordSet;
 import com.amazonaws.services.route53.model.Tag;
 import com.arkrud.TableInterface.CustomTable;
 import com.arkrud.TreeInterface.CustomTreeContainer;
@@ -67,20 +63,10 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject, Tr
 		int y = 0;
 		while (y < customRoute53ZoneTreeNode.getChildCount()) {
 			DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) customRoute53ZoneTreeNode.getChildAt(y);
-			CustomRoute53DNSRecord customRoute53DNSRecord = (CustomRoute53DNSRecord)theNode.getUserObject();
-			
-			ArrayList<Object> summaryData = new ArrayList<Object>();
-			summaryData.add(customRoute53DNSRecord.getName());
-			summaryData.add(customRoute53DNSRecord.getType());
-			if (customRoute53DNSRecord.getResourceRecords().size() > 0 ) {
-				summaryData.add(customRoute53DNSRecord.getResourceRecords().get(0).getValue());
-				
-			} else {
-				summaryData.add(" - ");
-			}
-			summaryData.add(customRoute53DNSRecord.getTTL());
+			CustomRoute53DNSRecord customRoute53DNSRecord = new CustomRoute53DNSRecord ((CustomRoute53DNSRecord)theNode.getUserObject());
+			route53ZonesRecordsData.add(customRoute53DNSRecord.getAWSDetailesPaneData());
 			y++;
-			route53ZonesRecordsData.add(summaryData);
+			
 		}
 
 

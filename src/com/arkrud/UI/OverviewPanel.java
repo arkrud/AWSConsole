@@ -34,6 +34,7 @@ import com.arkrud.aws.CustomObjects.CustomEC2NetworkInterface;
 import com.arkrud.aws.CustomObjects.CustomEC2SecurityGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2Volume;
+import com.arkrud.aws.CustomObjects.CustomRoute53DNSRecord;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
 /**
@@ -142,6 +143,9 @@ public class OverviewPanel extends JPanel {
 		CustomEC2Instance customEC2Instance;
 		CustomEC2ELB customEC2ELB;
 		CustomEC2TargetGroup customEC2TargetGroup;
+		CustomRoute53DNSRecord customRoute53DNSRecord;
+		System.out.println("dataFlag: " + dataFlag);
+		System.out.println("awsObject: " + awsObject.getClass().getSimpleName());
 		switch (dataFlag) {
 		case "InstanceStorage":
 			customEC2Instance = (CustomEC2Instance) awsObject;
@@ -163,10 +167,14 @@ public class OverviewPanel extends JPanel {
 			customEC2TargetGroup = (CustomEC2TargetGroup) awsObject;
 			properties = customEC2TargetGroup.getHealthCheckPaneData();
 			break;
-		case "DNSRecordSetAdvanced":
-			customEC2TargetGroup = (CustomEC2TargetGroup) awsObject;
-			properties = customEC2TargetGroup.getHealthCheckPaneData();
+		case "DNSRecordSet Advanced":
+			customRoute53DNSRecord = (CustomRoute53DNSRecord) awsObject;
+			properties = customRoute53DNSRecord.getRecordSetAdvancedPaneData();
 			break;
+		case "DNSRecordSet Details":
+			customRoute53DNSRecord = (CustomRoute53DNSRecord) awsObject;
+			properties = customRoute53DNSRecord.getAWSDetailesPaneData();
+			break;	
 		default:
 			properties = ((CustomAWSObject) awsObject).getAWSDetailesPaneData();
 			break;
