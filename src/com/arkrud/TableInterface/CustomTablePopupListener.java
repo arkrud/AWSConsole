@@ -65,12 +65,14 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		
 		table = (CustomTable) e.getSource();
 		vColIndex = table.getCustomColumnModel().getColumnIndexAtX(e.getX());
 		if (table.getSelectedRow() != -1) {
 			mRowIndex = table.convertRowIndexToModel(table.getSelectedRow());
 		}
 		if ((e.getClickCount()) == 1) {
+			
 			if (table.getModel().getValueAt(mRowIndex, vColIndex).getClass().toString().contains("S3ObjectSummary")) {
 			} else if (table.getModel().getValueAt(mRowIndex, vColIndex).getClass().toString().contains("S3Folder")) {
 				S3Folder s3Folder = (S3Folder) table.getModel().getValueAt(mRowIndex, vColIndex);
@@ -116,6 +118,7 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 				Object cellValue = table.getModel().getValueAt(realRowIndex, realColumnIndex);
 				String columnName = table.getModel().getColumnName(realColumnIndex);
 				int selectedRowsCount = table.getSelectedRowCount();
+				
 				if (cellValue instanceof AWSAccount) {
 					String[] menus = { "Delete AWS Account" };
 					addMenuItems(menus);
@@ -144,6 +147,15 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 					}
 				} else if (cellValue instanceof LinkLikeButton) {
 					customAWSObject = ((LinkLikeButton) table.getModel().getValueAt(mRowIndex, vColIndex)).getCustomAWSObject();
+					customAWSObject.setAccount(awsAccount);
+					if (selectedRowsCount > 1) {
+						addMenuItems(customAWSObject.defineTableMultipleSelectionDropDown());
+					} else {
+						addMenuItems(customAWSObject.defineTableSingleSelectionDropDown());
+					}
+				} else if (cellValue instanceof CustomAWSObject) {
+					//customAWSObject = ((CustomAWSObject) table.getModel().getValueAt(mRowIndex, vColIndex)).getCustomAWSObject();
+					customAWSObject = (CustomAWSObject)cellValue;
 					customAWSObject.setAccount(awsAccount);
 					if (selectedRowsCount > 1) {
 						addMenuItems(customAWSObject.defineTableMultipleSelectionDropDown());

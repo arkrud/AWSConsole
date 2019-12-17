@@ -61,6 +61,9 @@ public class OverviewPanel extends JPanel {
 			propertyNameLabels[x].setFont(new Font("Serif", Font.BOLD, 12));
 			add(propertyNameLabels[x]);
 			Object property = properties.get(x);
+			System.out.println("property: " +  property);
+			if (property != null) {
+			System.out.println("property type: " + property.getClass().getSimpleName() + "and value: " +  propertyNameLabels[x]);}
 			if (property instanceof List<?>) {
 				if (((List<Object>) property).isEmpty()) {
 					LabelLikeTextPane labelLikeTextPane = new LabelLikeTextPane(" - ", false);
@@ -144,8 +147,6 @@ public class OverviewPanel extends JPanel {
 		CustomEC2ELB customEC2ELB;
 		CustomEC2TargetGroup customEC2TargetGroup;
 		CustomRoute53DNSRecord customRoute53DNSRecord;
-		System.out.println("dataFlag: " + dataFlag);
-		System.out.println("awsObject: " + awsObject.getClass().getSimpleName());
 		switch (dataFlag) {
 		case "InstanceStorage":
 			customEC2Instance = (CustomEC2Instance) awsObject;

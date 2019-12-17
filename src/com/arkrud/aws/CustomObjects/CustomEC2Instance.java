@@ -82,18 +82,15 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	public String[] instancesTableColumnHeaders = { "Instance Name", "Instance ID", "Instance Type", "Availability Zone", "Instance State", "Alarm Status", "Launch Time" };
 
 	public CustomEC2Instance(Instance instance) {
-		System.out.println("111");
 		this.instance = instance;
 	}
 
 	public CustomEC2Instance(AWSAccount account, String id) {
-		System.out.println("222");
 		this.instance = retriveOneEC2Instance(account, id);
 		this.account = account;
 	}
 
 	public CustomEC2Instance(AWSAccount account, String id, boolean filtered, String appFilter) {
-		System.out.println("333");
 		List<CustomEC2Instance> object = retriveEC2Instances(account, filtered, appFilter);
 		Iterator<CustomEC2Instance> iterator = object.iterator();
 		while (iterator.hasNext()) {
@@ -108,7 +105,6 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	public CustomEC2Instance() {
 		
 		super();
-		System.out.println("444");
 	}
 
 	@Override
@@ -674,7 +670,6 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	}
 	
 	private String getAlarmStateForInstanceSlow(AWSAccount account, String instanceId) {
-		System.out.println("Strat long method");
 		String alarmStatValue = "No Alarms Set";
 		AmazonCloudWatchClient amazonCloudWatchClient = new AmazonCloudWatchClient(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 		ListMetricsRequest listMetricsRequest = new ListMetricsRequest();
@@ -710,12 +705,10 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 				}
 			}
 		}
-		System.out.println("End long method");
 		return alarmStatValue;
 	}
 
 	private ArrayList<CustomEC2Instance> retriveEC2Instances(AWSAccount account, boolean filtered, String appFilter) {
-		System.out.println("!!!!!!!!!!!!!");
 		ArrayList<CustomEC2Instance> instances = new ArrayList<CustomEC2Instance>();
 		DescribeInstancesResult describeInstancesResult = null;
 		try {
@@ -734,32 +727,27 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 			Iterator<Instance> instanceIterator = reservation.getInstances().iterator();
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
-				System.out.println("5: " + instance.getInstanceId());
 				customInstance = new CustomEC2Instance(instance);
 				if (appFilter != null) {
 					if (filtered) {
 						if (UtilMethodsFactory.getEC2ObjectFilterTag(instance.getTags(), "Name").matches(appFilter)) {
 							customInstance.setAccount(account);
 							instances.add(customInstance);
-							System.out.println("1: " + instance.getInstanceId());
-						}
+							}
 					} else {
 						customInstance.setAccount(account);
 						instances.add(customInstance);
-						System.out.println("2: " + instance.getInstanceId());
-					}
+						}
 				} else {
 					if (filtered) {
 						if (UtilMethodsFactory.getEC2ObjectFilterTag(instance.getTags(), "Name").matches(UtilMethodsFactory.getMatchString(account))) {
 							customInstance.setAccount(account);
 							instances.add(customInstance);
-							System.out.println("3: " + instance.getInstanceId());
-						}
+							}
 					} else {
 						customInstance.setAccount(account);
 						instances.add(customInstance);
-						System.out.println("4: " + instance.getInstanceId());
-					}
+						}
 				}
 			}
 		}
@@ -767,11 +755,9 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	}
 
 	private ArrayList<CustomEC2Instance> retriveEC2InstancesFilter(AWSAccount account, boolean filtered, String appFilter) {
-		System.out.println("!!!!!!!!!!!!!");
 		ArrayList<CustomEC2Instance> instances = new ArrayList<CustomEC2Instance>();
 		DescribeInstancesResult describeInstancesResult = null;
 		DescribeInstancesRequest request = new DescribeInstancesRequest().withFilters(new Filter("tag:" + "Services").withValues("alerter"));
-		System.out.println("5: " + appFilter);
 		try {
 			AmazonEC2 client = EC2Common.connectToEC2(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 			client.setRegion(account.getAccontRegionObject());
@@ -791,8 +777,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 				customInstance = new CustomEC2Instance(instance);
 				customInstance.setAccount(account);
 				instances.add(customInstance);
-				System.out.println("5: " + instance.getInstanceId());
-			}
+				}
 		}
 		return instances;
 	}
@@ -817,8 +802,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
 				customInstance = new CustomEC2Instance(instance);
-				System.out.println("5: " + instance.getInstanceId());
-			}
+				}
 		}
 		return customInstance;
 	}
@@ -842,7 +826,6 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 			Iterator<Instance> instanceIterator = reservation.getInstances().iterator();
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
-				System.out.println(instance.getInstanceId());
 				customInstance = new CustomEC2Instance(instance);
 			}
 		}
@@ -861,7 +844,6 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 		} catch (AmazonClientException e) {
 			e.printStackTrace();
 		}
-		System.out.println("1: ");
 		return describeInstancesResult.getReservations().get(0);
 	}
 

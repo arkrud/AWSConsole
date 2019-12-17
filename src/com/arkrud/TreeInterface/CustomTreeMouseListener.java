@@ -169,7 +169,6 @@ public class CustomTreeMouseListener implements MouseListener, PropertyChangeLis
 	}
 
 	private void showTable(Object obj, JScrollableDesktopPane pane, TreePath path, String tableIdentifier, String[] columnHeaders) {
-		System.out.println("Intermidiats");
 		/*final CustomProgressBar progFrame = new CustomProgressBar(true, false, "Retrieving Instances Info");
 		progFrame.getPb().setIndeterminate(true);
 		SwingWorker<Void, Void> w = new SwingWorker<Void, Void>() {
@@ -216,12 +215,10 @@ public class CustomTreeMouseListener implements MouseListener, PropertyChangeLis
 		} else if (obj instanceof CustomRoute53Zone) {
 			
 			frameTitle = ((CustomRoute53Zone) obj).getName() + " For " + ((CustomRoute53Zone) obj).getAccount().getAccountAlias();
-			System.out.println("frameTitle: " +  frameTitle);
 		}
 		ArrayList<String> tableColumnHeaders = new ArrayList<String>(Arrays.asList(columnHeaders));
 		
 		CustomTable table = new CustomTable(obj, tableColumnHeaders, pane, tableIdentifier, false);
-		System.out.println("table Ready to open");
 		table.setParentTreeNode((DefaultMutableTreeNode) path.getLastPathComponent());
 		table.setTree(tree);
 		table.setDash(dash);

@@ -137,7 +137,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	@Override
 	public ArrayList<Object> getAWSDetailesPaneData() {
 		ArrayList<Object> summaryData = new ArrayList<Object>();
-		summaryData.add(getName());
+		summaryData.add(this);
 		summaryData.add(getType());
 		if (getResourceRecords().size() > 0 ) {
 			summaryData.add(getResourceRecords().get(0).getValue());
@@ -269,7 +269,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public String getObjectAWSID() {
-		return resourceRecordSet.getSetIdentifier();
+		return resourceRecordSet.getName();
 	}
 
 	@Override

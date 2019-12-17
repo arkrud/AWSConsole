@@ -60,6 +60,7 @@ import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2Volume;
 import com.arkrud.aws.CustomObjects.CustomIAMInstanceProfile;
 import com.arkrud.aws.CustomObjects.CustomRegionObject;
+import com.arkrud.aws.CustomObjects.CustomRoute53DNSRecord;
 import com.arkrud.aws.CustomObjects.CustomRoute53Zone;
 import com.arkrud.aws.StaticFactories.EC2Common;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
@@ -83,7 +84,7 @@ public class CustomTable extends JTable {
 	private static Class<?>[] renderedClasses = { S3ObjectSummary.class, CustomEC2ELB.class, CustomEC2ELBV2.class, CustomEC2TargetGroup.class, String.class,
 			Integer.class, SecurityGroup.class, Stack.class, AWSAccount.class, S3Folder.class, Owner.class, CustomEC2AMI.class, CustomEC2SnapShot.class,
 			LinkLikeButton.class, CustomEC2Instance.class, CustomEC2KeyPair.class, CustomEC2Asg.class, CustomEC2LC.class, CustomEC2Volume.class,
-			CustomIAMInstanceProfile.class, CFStackTreeNodeUserObject.class, CustomEC2NetworkInterface.class, Listener.class, Rule.class };
+			CustomIAMInstanceProfile.class, CFStackTreeNodeUserObject.class, CustomEC2NetworkInterface.class, Listener.class, Rule.class, CustomRoute53DNSRecord.class };
 
 	public CustomTable() {
 	}
@@ -126,8 +127,6 @@ public class CustomTable extends JTable {
 		setRowSorter(myModelSorter);
 		// Apply model to the table
 		setModel(model);
-		System.out.println("Boomww");
-		
 		// Configure table interface options
 		setPreferredScrollableViewportSize(getPreferredSize());
 		setFillsViewportHeight(true);
@@ -166,9 +165,7 @@ public class CustomTable extends JTable {
 	}
 
 	private void populateModelData(CustomTableModel model) {
-		System.out.println("ddd " + dataObject.getClass().getSimpleName());
 		if (dataObject instanceof CustomRoute53Zone ) {
-			System.out.println("Another boom");
 			model.generateTableData(((CustomRoute53Zone) dataObject).getAccount(), dataObject, tableUsageIdentifier);
 			awsAccount = ((CustomRoute53Zone) dataObject).getAccount();
 		} else {
@@ -234,7 +231,6 @@ public class CustomTable extends JTable {
 	}
 
 	private void createButtonLikeColums(JScrollableDesktopPane jScrollableDesktopPan) {
-		System.out.println("tableUsageIdentifier: " +  tableUsageIdentifier); 
 		if (tableUsageIdentifier.equals("CustomEC2SecurityGroup") || tableUsageIdentifier.equals("ELBSecurityGroupsList")) {
 			ArrayList<String> tagsTableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.tagsTableColumnHeaders));
 			ButtonColumn buttonTagColumn = new ButtonColumn(this,
