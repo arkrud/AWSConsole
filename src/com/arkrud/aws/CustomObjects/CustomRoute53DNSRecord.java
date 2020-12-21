@@ -10,6 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.amazonaws.services.route53.AmazonRoute53;
 import com.amazonaws.services.route53.AmazonRoute53Client;
 import com.amazonaws.services.route53.model.AliasTarget;
@@ -75,7 +77,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	private String action = "Delete";
 	private String objectNickName = "DNSRecordSet";
 	private String[] recordSetColumnHeaders = { "Record Set Name", "Type", "Value", "TTL" };
-	private JLabel[] recordSetDetailesLabels = { new JLabel("Record Set Name"), new JLabel("Type"), new JLabel("Value"), new JLabel("TTL") };
+	private JLabel[] recordSetDetailesLabels = { new JLabel("Record Set Name"), new JLabel("Name"),new JLabel("Type"), new JLabel("Value"), new JLabel("TTL") };
 	private JLabel[] recordSetAdvancedLabels = { new JLabel("Evaluate target Health"), new JLabel("Helth Check ID"), new JLabel("Region"), new JLabel("Weight"), new JLabel("Geolocation"), new JLabel("Multivalue Answer"), new JLabel("Set ID"), new JLabel("Failover"), new JLabel("Traffic Policy Instance Id")  };
 
 	public CustomRoute53DNSRecord() {
@@ -138,6 +140,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	public ArrayList<Object> getAWSDetailesPaneData() {
 		ArrayList<Object> summaryData = new ArrayList<Object>();
 		summaryData.add(this);
+		summaryData.add(StringUtils.substring(getName(),0, -1));
 		summaryData.add(getType());
 		if (getResourceRecords().size() > 0 ) {
 			summaryData.add(getResourceRecords().get(0).getValue());
@@ -305,7 +308,6 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 
 	@Override
 	public String getRegion() {
-		// TODO Auto-generated method stub
 		return resourceRecordSet.getRegion();
 	}
 

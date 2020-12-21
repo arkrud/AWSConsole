@@ -16,6 +16,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.services.autoscaling.AmazonAutoScaling;
 import com.amazonaws.services.autoscaling.AmazonAutoScalingClientBuilder;
 import com.amazonaws.services.autoscaling.model.BlockDeviceMapping;
+import com.amazonaws.services.autoscaling.model.DescribeLaunchConfigurationsRequest;
 import com.amazonaws.services.autoscaling.model.DescribeLaunchConfigurationsResult;
 import com.amazonaws.services.autoscaling.model.InstanceMonitoring;
 import com.amazonaws.services.autoscaling.model.LaunchConfiguration;
@@ -382,19 +383,27 @@ public class CustomEC2LC extends LaunchConfiguration implements CustomAWSObject 
 		ArrayList<CustomEC2LC> customEC2LCs = new ArrayList<CustomEC2LC>();
 		AWSStaticCredentialsProvider provider = new AWSStaticCredentialsProvider(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 		AmazonAutoScaling as = AmazonAutoScalingClientBuilder.standard().withRegion(account.getAccountRegion()).withCredentials(provider).build();
-		DescribeLaunchConfigurationsResult result = as.describeLaunchConfigurations();
-		Iterator<LaunchConfiguration> lcIterator = result.getLaunchConfigurations().iterator();
-		while (lcIterator.hasNext()) {
-			LaunchConfiguration launchConfiguration = lcIterator.next();
-			if (appFilter != null) {
-				if (launchConfiguration.getLaunchConfigurationName().matches(appFilter)) {
-					customEC2LCs.add(new CustomEC2LC(launchConfiguration));
-				}
-			} else {
-				if (launchConfiguration.getLaunchConfigurationName().matches(UtilMethodsFactory.getMatchString(account))) {
-					customEC2LCs.add(new CustomEC2LC(launchConfiguration));
+		String token = null;
+		while (true) {
+			DescribeLaunchConfigurationsRequest request = new DescribeLaunchConfigurationsRequest();
+			request.setNextToken(token);
+			DescribeLaunchConfigurationsResult result = as.describeLaunchConfigurations(request);
+			Iterator<LaunchConfiguration> lcIterator = result.getLaunchConfigurations().iterator();
+			while (lcIterator.hasNext()) {
+				LaunchConfiguration launchConfiguration = lcIterator.next();
+				if (appFilter != null) {
+					if (launchConfiguration.getLaunchConfigurationName().matches(appFilter)) {
+						customEC2LCs.add(new CustomEC2LC(launchConfiguration));
+					}
+				} else {
+					if (launchConfiguration.getLaunchConfigurationName().matches(UtilMethodsFactory.getMatchString(account))) {
+						customEC2LCs.add(new CustomEC2LC(launchConfiguration));
+					}
 				}
 			}
+			token = result.getNextToken();
+			if (token == null)
+				break;
 		}
 		return customEC2LCs;
 	}

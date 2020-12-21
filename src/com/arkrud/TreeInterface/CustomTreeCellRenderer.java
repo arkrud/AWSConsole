@@ -52,6 +52,8 @@ public class CustomTreeCellRenderer extends DefaultTreeCellRenderer {
 				setIcon(images.get("iam"));
 			} else if (e.getAwsServiceName().contains("Network Services")) {
 				setIcon(images.get("network"));
+			} else if (e.getAwsServiceName().contains("API")) {
+				setIcon(images.get("apigateway"));
 			}
 			setText(e.getAwsServiceName());
 		} else if (obj instanceof Bucket) {

@@ -41,6 +41,7 @@ import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.AWSService;
 import com.arkrud.aws.AwsCommon;
 import com.arkrud.aws.S3Folder;
+import com.arkrud.aws.CustomObjects.CustomAPIGateway;
 import com.arkrud.aws.CustomObjects.CustomAWSObject;
 import com.arkrud.aws.StaticFactories.S3Common;
 import com.tomtessier.scrollabledesktop.BaseInternalFrame;
@@ -166,6 +167,12 @@ public class CustomTreePopupHandler implements ActionListener, PropertyChangeLis
 			if (ac.equals("REFRESH")) {
 				theTree.refreshTreeNodeWithProgress(node, false, null);
 			} else if (ac.equals("ADD SECURITY GROUP")) {
+				//System.out.println("here it is");
+				//CustomAPIGateway.fetchApiGateways(account);
+				//CustomAPIGateway.fetchApiCustomDomains(account);
+				//CustomAPIGateway.getAPIGatewayIntegration(account,"wyfp5j7uag");
+				CustomAPIGateway.getAPIGatewayResources(account,"wyfp5j7uag");
+				
 				UtilMethodsFactory.showDialogToDesctop("AddSecurityGroupFrame", 300, 160, node, tree, dash, account, null, null, null);
 			}
 		} else {

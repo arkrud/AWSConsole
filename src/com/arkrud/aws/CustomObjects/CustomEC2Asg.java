@@ -423,23 +423,31 @@ public class CustomEC2Asg extends AutoScalingGroup implements CustomAWSObject {
 		@SuppressWarnings("deprecation")
 		AmazonAutoScalingClient amazonAutoScalingClient = new AmazonAutoScalingClient(AwsCommon.getAWSCredentials(account.getAccountAlias()));
 		amazonAutoScalingClient.setRegion(account.getAccontRegionObject());
-		DescribeAutoScalingGroupsRequest request = new DescribeAutoScalingGroupsRequest();
-		DescribeAutoScalingGroupsResult result = amazonAutoScalingClient.describeAutoScalingGroups(request);
-		List<AutoScalingGroup> asgs = result.getAutoScalingGroups();
-		Iterator<AutoScalingGroup> asgsIterator = asgs.iterator();
-		while (asgsIterator.hasNext()) {
-			AutoScalingGroup asg = asgsIterator.next();
-			if (appFilter != null) {
-				if (asg.getAutoScalingGroupName().matches(appFilter)) {
-					CustomEC2Asg customAsg = new CustomEC2Asg(asg);
-					customEC2ASGs.add(customAsg);
-				}
-			} else {
-				if (asg.getAutoScalingGroupName().matches(UtilMethodsFactory.getMatchString(account))) {
-					CustomEC2Asg customAsg = new CustomEC2Asg(asg);
-					customEC2ASGs.add(customAsg);
+		String token = null;
+		List<AutoScalingGroup> asgs = new ArrayList<>();
+		while (true) {
+			DescribeAutoScalingGroupsRequest request = new DescribeAutoScalingGroupsRequest();
+			request.setNextToken(token);
+			DescribeAutoScalingGroupsResult result = amazonAutoScalingClient.describeAutoScalingGroups(request);
+			asgs = result.getAutoScalingGroups();
+			Iterator<AutoScalingGroup> asgsIterator = asgs.iterator();
+			while (asgsIterator.hasNext()) {
+				AutoScalingGroup asg = asgsIterator.next();
+				if (appFilter != null) {
+					if (asg.getAutoScalingGroupName().matches(appFilter)) {
+						CustomEC2Asg customAsg = new CustomEC2Asg(asg);
+						customEC2ASGs.add(customAsg);
+					}
+				} else {
+					if (asg.getAutoScalingGroupName().matches(UtilMethodsFactory.getMatchString(account))) {
+						CustomEC2Asg customAsg = new CustomEC2Asg(asg);
+						customEC2ASGs.add(customAsg);
+					}
 				}
 			}
+			token = result.getNextToken();
+			if (token == null)
+				break;
 		}
 		return customEC2ASGs;
 	}

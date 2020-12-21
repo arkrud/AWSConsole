@@ -1,13 +1,18 @@
 package com.arkrud.TreeInterface;
 
 import java.awt.Component;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
+import java.util.Enumeration;
 import java.util.EventObject;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreePath;
 
@@ -16,13 +21,16 @@ import com.arkrud.Util.UtilMethodsFactory;
 import com.arkrud.aws.AwsCommon;
 import com.arkrud.aws.CustomObjects.CustomRegionObject;
 
-public class StateEditor extends AbstractCellEditor implements TreeCellEditor {
+public class StateEditor extends AbstractCellEditor implements TreeCellEditor, ItemListener {
 	private static final long serialVersionUID = 1L;
 	private JCheckBox checkBox;
 	private TreeNodeState editorValue;
+	private DefaultMutableTreeNode node;
+	private JTree tree;
 
 	public StateEditor() {
 		checkBox = new JCheckBox();
+		checkBox.addItemListener(this);
 		checkBox.setOpaque(false);
 	}
 
@@ -36,7 +44,7 @@ public class StateEditor extends AbstractCellEditor implements TreeCellEditor {
 	@Override
 	public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
 		if (value instanceof DefaultMutableTreeNode) {
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+			node = (DefaultMutableTreeNode) value;
 			TreeNodeState state = (TreeNodeState) node.getUserObject();
 			editorValue = state;
 			checkBox.setText(state.getNodeText());
@@ -55,7 +63,7 @@ public class StateEditor extends AbstractCellEditor implements TreeCellEditor {
 		}
 		if (event != null && event.getSource() instanceof JTree && event instanceof MouseEvent) {
 			MouseEvent mouseEvent = (MouseEvent) event;
-			JTree tree = (JTree) event.getSource();
+			 tree = (JTree) event.getSource();
 			TreePath path = tree.getPathForLocation(mouseEvent.getX(), mouseEvent.getY());
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 			if (node.getUserObject() instanceof AwsCommon) {
@@ -72,5 +80,29 @@ public class StateEditor extends AbstractCellEditor implements TreeCellEditor {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if (((TreeNodeState)node.getUserObject()).isSelected()) {
+			Enumeration<?> children = node.preorderEnumeration();
+			while (children.hasMoreElements()) {
+				DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) children.nextElement();
+				TreeNodeState state = (TreeNodeState)theNode.getUserObject();
+				state.setSelected(false);
+			}
+		} else {
+			Enumeration<?> children = node.preorderEnumeration();
+			while (children.hasMoreElements()) {
+				DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) children.nextElement();
+				TreeNodeState state = (TreeNodeState)theNode.getUserObject();
+				state.setSelected(true);
+			}
+		}
+		
+		tree.collapsePath(new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(node)));
+		tree.expandPath(new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(node)));
+		
+		
 	}
 }

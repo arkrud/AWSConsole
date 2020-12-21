@@ -30,7 +30,7 @@ import com.arkrud.Util.UtilMethodsFactory;
  * Opens the dashboard with top tree element collapsed.
  */
 @SuppressWarnings("serial")
-public class LoginFrame extends JFrame implements ActionListener { // NO_UCD (unused code)
+public class LoginFrame extends JFrame implements ActionListener { 
 	private JButton submitButton, cancelButton;
 	private JPanel loginDialogPanel, imagePanel, overPanel;
 	private JLabel userNameLabel, passwordLabel, iconLabel;

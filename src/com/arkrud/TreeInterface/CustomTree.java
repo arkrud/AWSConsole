@@ -41,6 +41,7 @@ import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.AWSService;
 import com.arkrud.aws.AwsCommon;
 import com.arkrud.aws.CustomObjects.CFStackTreeNodeUserObject;
+import com.arkrud.aws.CustomObjects.CustomAPIGateway;
 import com.arkrud.aws.CustomObjects.CustomEC2AMI;
 import com.arkrud.aws.CustomObjects.CustomEC2Asg;
 import com.arkrud.aws.CustomObjects.CustomEC2ELB;
@@ -80,6 +81,7 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 	private Class<?> treeContainerEC2Classes[] = { CustomEC2SecurityGroup.class, CustomEC2ELB.class, CustomEC2ELBV2.class, CustomEC2TargetGroup.class, CustomEC2KeyPair.class, CustomEC2ELBPolicyType.class, CustomEC2Instance.class, CustomEC2AMI.class,
 			CustomEC2Volume.class, CustomEC2SnapShot.class, CustomEC2Asg.class, CustomEC2LC.class, CustomEC2NetworkInterface.class };
 	private Class<?> treeContainerIAMClasses[] = { CustomIAMInstanceProfile.class };
+	private Class<?> treeContainerAPIGatewayClasses[] = { CustomAPIGateway.class };
 	private Class<?> treeContainerRoute53Classes[] = { CustomRoute53Zone.class };
 	public String ec2TreeContainerNames[] = { "Security Groups", "Load Balancers", "V2 Load Balancers", "Target Groups", "Key Pairs", "ELB Polices", "Instances", "AMIs", "Volumes", "Snapshots", "Autoscaling Groups", "Launch Configurations",
 			"Network Interfaces" };
@@ -87,6 +89,7 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 	public String cfTreeContainerNames[] = { "Stacks" };
 	public String vpcTreeContainerNames[] = { "Subnets" };
 	public String route53TreeContainerNames[] = { "Zones" };
+	public String apiGatewayTreeContainerNames[] = {"APIs"}; //, "CustomDomain Names", "VPC Links" 
 	private DefaultMutableTreeNode top;
 	private DefaultTreeModel treeModel;
 	private JTree cloudTree;
@@ -326,6 +329,8 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 					if (serviceName.contains("S3")) {
 					} else if (serviceName.contains("EC2")) {
 						populateServiceAWSObjectsConfigs(theNode, accountAlias, ec2TreeContainerNames);
+					} else if (serviceName.contains("API")) {
+						populateServiceAWSObjectsConfigs(theNode, accountAlias, apiGatewayTreeContainerNames);
 					} else if (serviceName.contains("Cloud Formation")) {
 					} else if (serviceName.contains("Network Services")) {
 					} else if (serviceName.contains("Route53")) {
@@ -367,6 +372,8 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 			x++;
 		}
 	}
+	
+
 
 	/**
 	 * Populate AWS accounts and services based on data saved in INI configuration file<br>
@@ -382,6 +389,8 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 						populateS3Nodes(theNode);
 					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("EC2")) {
 						populateEC2Nodes(theNode, appFilter);
+					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("API")) {
+						populateAPIGatewayNodes(theNode, appFilter);
 					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("Cloud Formation")) {
 						CustomTreeContainer container = new CustomTreeContainer();
 						DefaultMutableTreeNode cfStackContainerNode = new DefaultMutableTreeNode(container);
@@ -446,6 +455,32 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Populate AWS EC2 service data<br>
+	 */
+	private void populateAPIGatewayNodes(DefaultMutableTreeNode apiGatewayNode, String appFilter) {
+		AWSAccount awsAccount = ((AWSService) apiGatewayNode.getUserObject()).getTheAccount();
+		LinkedHashMap<Class<?>, String> objectsMap = new LinkedHashMap<Class<?>, String>();
+		for (int i = 0; i < treeContainerAPIGatewayClasses.length; i++) {
+			objectsMap.put(treeContainerAPIGatewayClasses[i], apiGatewayTreeContainerNames[i]);
+		}
+		for (Class<?> key : objectsMap.keySet()) {
+			if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), awsAccount.getAccountAlias(), objectsMap.get(key)))) {
+				CustomTreeContainer container = new CustomTreeContainer();
+				container.setAccount(awsAccount);
+				container.setChildObject(key);
+				container.setContainerName(objectsMap.get(key));
+				DefaultMutableTreeNode apiGatewayContainerNode = new DefaultMutableTreeNode(container);
+				apiGatewayNode.add(apiGatewayContainerNode);
+				try {
+					populateContainerObjects(apiGatewayContainerNode, appFilter);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}

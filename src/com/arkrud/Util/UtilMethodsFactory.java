@@ -89,7 +89,7 @@ public class UtilMethodsFactory {
 	public static String[] elbv2ListenerRulesTableColumnHeaders = { "ARN", "Default", "Priority", "Rules Actions", "Rules Conditions" };
 	private static String[] awsAccountsTableColumnHeaders = { "Account", "aws_access_key_id", "aws_secret_access_key", "Region" };
 	public static String[] tagsTableColumnHeaders = { "Key", "Value" };
-	public static String[][] awsServicesInfo = { { "S3 Service", "Unlimited And Undistructable Storage", "s3_service" }, { "EC2 Service", "AWS Compute SErvice", "ec2_service" }, { "Cloud Formation", "AWS Environment Automation", "cf_service" },
+	public static String[][] awsServicesInfo = { { "S3 Service", "Unlimited And Undistructable Storage", "s3_service" }, { "EC2 Service", "AWS Compute Service", "ec2_service" }, { "APIGateway Service", "AWS API Gateway Service", "apigateway_service" }, { "Cloud Formation", "AWS Environment Automation", "cf_service" },
 			{ "IAM", "AWS Identity and Access Management", "iam_service" }, { "Network Services", "Virtual Network Services", "net_service" } , { "Route53", "DNS Services", "dns_service" } };
 
 	public static void addInternalFrameToScrolableDesctopPane(String frameTitle, JScrollableDesktopPane jScrollableDesktopPan, BaseInternalFrame theFrame) {

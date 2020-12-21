@@ -162,7 +162,7 @@ public class CustomTablePopupListener extends MouseAdapter implements ActionList
 					} else {
 						addMenuItems(customAWSObject.defineTableSingleSelectionDropDown());
 					}
-				} else {
+				}  else {
 					
 				}
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());

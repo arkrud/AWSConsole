@@ -50,6 +50,7 @@ public class CustomEC2TargetGroup extends TargetGroup implements CustomAWSObject
 	private TargetGroup targetGroup;
 	private String[] tgTableColumnHeaders = { "Name", "ARN", "Port", "Protocol", "Target Type", "Load Balancer", "VPC ID" };
 	private String[] elbTargetsTableColumnHeaders = { "Name", "Instance ID", "Port", "Availability Zone", "Health", "Reason" };
+	private String[] elbIPTargetsTableColumnHeaders = { "IP", "Port", "Availability Zone", "Health", "Reason" };
 	private String[] elbAZsTableColumnHeaders = { "Availability Zone", "Subnet ID", "Target Count", "Health" };
 	private String[] attributesTableColumnHeaders = { "Attribute", "Value" };
 	private JLabel[] tgOverviewHeaderLabels = { new JLabel("Name: "), new JLabel("ARN: "), new JLabel("Port: "), new JLabel("Protocol: "),
@@ -263,23 +264,42 @@ public class CustomEC2TargetGroup extends TargetGroup implements CustomAWSObject
 		Iterator<TargetHealthDescription> targetHealthDescriptionsIterator = result.getTargetHealthDescriptions().iterator();
 		while (targetHealthDescriptionsIterator.hasNext()) {
 			TargetHealthDescription targetHealthDescription = targetHealthDescriptionsIterator.next();
+			
 			ArrayList<Object> tgTargetData = new ArrayList<Object>();
-			tgTargetData.add(new CustomEC2Instance(getAccount(), targetHealthDescription.getTarget().getId()));
-			LinkLikeButton linkLikeIDButton = new LinkLikeButton(targetHealthDescription.getTarget().getId());
-			linkLikeIDButton.setAccount(account);
-			linkLikeIDButton.setName("TableLinkLikeButton");
-			tgTargetData.add(linkLikeIDButton);
-			tgTargetData.add(targetHealthDescription.getTarget().getPort());
-			tgTargetData.add(new CustomEC2Instance(getAccount(), targetHealthDescription.getTarget().getId()).getPlacement().getAvailabilityZone());
-			tgTargetData.add(targetHealthDescription.getTargetHealth().getState());
-			String reason = "";
-			if (targetHealthDescription.getTargetHealth().getReason() == null) {
-				reason = "HealthCheck Passed";
+			if(getTargetType().equals("ip")) {
+				tgTargetData.add(targetHealthDescription.getTarget().getId());
+				tgTargetData.add(targetHealthDescription.getTarget().getPort());
+				tgTargetData.add(targetHealthDescription.getTarget().getAvailabilityZone());
+				tgTargetData.add(targetHealthDescription.getTargetHealth().getState());
+				String reason = "";
+				if (targetHealthDescription.getTargetHealth().getReason() == null) {
+					reason = "HealthCheck Passed";
+				} else {
+					reason = targetHealthDescription.getTargetHealth().getReason();
+				}
+				tgTargetData.add(reason);
+				tgTargetsData.add(tgTargetData);
 			} else {
-				reason = targetHealthDescription.getTargetHealth().getReason();
+				tgTargetData.add(new CustomEC2Instance(getAccount(), targetHealthDescription.getTarget().getId()));
+				LinkLikeButton linkLikeIDButton = new LinkLikeButton(targetHealthDescription.getTarget().getId());
+				linkLikeIDButton.setAccount(account);
+				linkLikeIDButton.setName("TableLinkLikeButton");
+				tgTargetData.add(linkLikeIDButton);
+				tgTargetData.add(targetHealthDescription.getTarget().getPort());
+				tgTargetData.add(new CustomEC2Instance(getAccount(), targetHealthDescription.getTarget().getId()).getPlacement().getAvailabilityZone());
+				tgTargetData.add(targetHealthDescription.getTargetHealth().getState());
+				String reason = "";
+				if (targetHealthDescription.getTargetHealth().getReason() == null) {
+					reason = "HealthCheck Passed";
+				} else {
+					reason = targetHealthDescription.getTargetHealth().getReason();
+				}
+				tgTargetData.add(reason);
+				tgTargetsData.add(tgTargetData);
 			}
-			tgTargetData.add(reason);
-			tgTargetsData.add(tgTargetData);
+				
+			
+			
 		}
 		return tgTargetsData;
 	}
@@ -294,9 +314,16 @@ public class CustomEC2TargetGroup extends TargetGroup implements CustomAWSObject
 		Iterator<TargetHealthDescription> targetHealthDescriptionsIterator = result.getTargetHealthDescriptions().iterator();
 		while (targetHealthDescriptionsIterator.hasNext()) {
 			TargetHealthDescription targetHealthDescription = targetHealthDescriptionsIterator.next();
-			if ((new CustomEC2Instance(getAccount(), targetHealthDescription.getTarget().getId()).getPlacement().getAvailabilityZone().equals(azName))) {
-				tgTargetsInAZCount++;
+			if (getTargetType().equals("ip")) {
+				if (targetHealthDescription.getTarget().getAvailabilityZone().equals(azName)) {
+					tgTargetsInAZCount++;
+				}
+			} else {
+				if ((new CustomEC2Instance(getAccount(), targetHealthDescription.getTarget().getId()).getPlacement().getAvailabilityZone().equals(azName))) {
+					tgTargetsInAZCount++;
+				}
 			}
+			
 		}
 		return tgTargetsInAZCount;
 	}
@@ -467,8 +494,13 @@ public class CustomEC2TargetGroup extends TargetGroup implements CustomAWSObject
 	public LinkedHashMap<String[][], String[][][]> getPropertiesPaneTableParams() {
 		LinkedHashMap<String[][], String[][][]> map = new LinkedHashMap<String[][], String[][][]>();
 		String[][] dataFlags0 = { { "TargetGroupTargets", "TargetGroupAvailabilityZones" } };
-		String[][][] columnHeaders0 = { { elbTargetsTableColumnHeaders, elbAZsTableColumnHeaders } };
-		map.put(dataFlags0, columnHeaders0);
+		if(getTargetType().equals("ip")) {
+			String[][][] columnHeaders0 = { { elbIPTargetsTableColumnHeaders, elbAZsTableColumnHeaders } };
+			map.put(dataFlags0, columnHeaders0);
+		} else {
+			String[][][] columnHeaders0 = { { elbTargetsTableColumnHeaders, elbAZsTableColumnHeaders } };
+			map.put(dataFlags0, columnHeaders0);
+		}
 		String[][] dataFlags1 = { { "TargetGroupAttributes" } };
 		String[][][] columnHeaders1 = { { attributesTableColumnHeaders } };
 		map.put(dataFlags1, columnHeaders1);

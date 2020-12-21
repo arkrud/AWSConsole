@@ -81,10 +81,9 @@ public class CustomTable extends JTable {
 	private Object dataObject;
 	private boolean editable;
 	private TableRowSorter<CustomTableModel> myModelSorter;
-	private static Class<?>[] renderedClasses = { S3ObjectSummary.class, CustomEC2ELB.class, CustomEC2ELBV2.class, CustomEC2TargetGroup.class, String.class,
-			Integer.class, SecurityGroup.class, Stack.class, AWSAccount.class, S3Folder.class, Owner.class, CustomEC2AMI.class, CustomEC2SnapShot.class,
-			LinkLikeButton.class, CustomEC2Instance.class, CustomEC2KeyPair.class, CustomEC2Asg.class, CustomEC2LC.class, CustomEC2Volume.class,
-			CustomIAMInstanceProfile.class, CFStackTreeNodeUserObject.class, CustomEC2NetworkInterface.class, Listener.class, Rule.class, CustomRoute53DNSRecord.class };
+	private static Class<?>[] renderedClasses = { S3ObjectSummary.class, CustomEC2ELB.class, CustomEC2ELBV2.class, CustomEC2TargetGroup.class, String.class, Integer.class, SecurityGroup.class, Stack.class, AWSAccount.class, S3Folder.class,
+			Owner.class, CustomEC2AMI.class, CustomEC2SnapShot.class, LinkLikeButton.class, CustomEC2Instance.class, CustomEC2KeyPair.class, CustomEC2Asg.class, CustomEC2LC.class, CustomEC2Volume.class, CustomIAMInstanceProfile.class,
+			CFStackTreeNodeUserObject.class, CustomEC2NetworkInterface.class, Listener.class, Rule.class, CustomRoute53DNSRecord.class };
 
 	public CustomTable() {
 	}
@@ -105,10 +104,8 @@ public class CustomTable extends JTable {
 		addMouseListener(new CustomTablePopupListener(tablePopup, null, null));
 	}
 
-	public CustomTable(Object dataObject, ArrayList<String> columnHeaders, JScrollableDesktopPane jScrollableDesktopPan, String tableUsageIdentifier,
-			boolean editable) {
+	public CustomTable(Object dataObject, ArrayList<String> columnHeaders, JScrollableDesktopPane jScrollableDesktopPan, String tableUsageIdentifier, boolean editable) {
 		super();
-		
 		// Variable reassignment to use constructor parameter in class methods
 		this.tableUsageIdentifier = tableUsageIdentifier;
 		this.dataObject = dataObject;
@@ -119,9 +116,8 @@ public class CustomTable extends JTable {
 		// Generate table column header from model
 		model.generateTableHeaders(columnHeaders);
 		if (dataObject instanceof Dashboard) {
-			model.setDash((Dashboard)dataObject);
+			model.setDash((Dashboard) dataObject);
 		}
-		
 		// Set table to be sortable by clicking on the header
 		myModelSorter = new TableRowSorter<CustomTableModel>(model);
 		setRowSorter(myModelSorter);
@@ -165,7 +161,7 @@ public class CustomTable extends JTable {
 	}
 
 	private void populateModelData(CustomTableModel model) {
-		if (dataObject instanceof CustomRoute53Zone ) {
+		if (dataObject instanceof CustomRoute53Zone) {
 			model.generateTableData(((CustomRoute53Zone) dataObject).getAccount(), dataObject, tableUsageIdentifier);
 			awsAccount = ((CustomRoute53Zone) dataObject).getAccount();
 		} else {
@@ -179,8 +175,6 @@ public class CustomTable extends JTable {
 				model.generateTableData(null, dataObject, tableUsageIdentifier);
 			}
 		}
-		
-		
 	}
 
 	private void createComboBoxSelectorColumns() {
@@ -199,8 +193,8 @@ public class CustomTable extends JTable {
 			if (editable) {
 				setupHintTextField(getColumn("Range"));
 			}
-		} else if (tableUsageIdentifier.contains("AddELBListenersSimple") || tableUsageIdentifier.contains("AddELBListenersAdvanced")
-				|| tableUsageIdentifier.contains("EditELBListenersSimple") || tableUsageIdentifier.contains("EditELBListenersAdvanced")) {
+		} else if (tableUsageIdentifier.contains("AddELBListenersSimple") || tableUsageIdentifier.contains("AddELBListenersAdvanced") || tableUsageIdentifier.contains("EditELBListenersSimple")
+				|| tableUsageIdentifier.contains("EditELBListenersAdvanced")) {
 			ArrayList<String> columnData = new ArrayList<String>();
 			columnData.add("HTTP");
 			columnData.add("HTTPS");
@@ -233,40 +227,34 @@ public class CustomTable extends JTable {
 	private void createButtonLikeColums(JScrollableDesktopPane jScrollableDesktopPan) {
 		if (tableUsageIdentifier.equals("CustomEC2SecurityGroup") || tableUsageIdentifier.equals("ELBSecurityGroupsList")) {
 			ArrayList<String> tagsTableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.tagsTableColumnHeaders));
-			ButtonColumn buttonTagColumn = new ButtonColumn(this,
-					new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tagsTableColumnHeadersArrayList, "Key", "Tags ", "Tags"), 5);
+			ButtonColumn buttonTagColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tagsTableColumnHeadersArrayList, "Key", "Tags ", "Tags"), 5);
 			ArrayList<String> tableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.securityGroupsRulesTableColumnHeaders));
-			ButtonColumn buttonIngressColumn = new ButtonColumn(this,
-					new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Rule Type", "Igress Rules ", "Ingress"), 6);
-			ButtonColumn buttonEgressColumn = new ButtonColumn(this,
-					new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Rule Type", "Egress Rules ", "Egress"), 7);
+			ButtonColumn buttonIngressColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Rule Type", "Igress Rules ", "Ingress"), 6);
+			ButtonColumn buttonEgressColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Rule Type", "Egress Rules ", "Egress"), 7);
 			buttonTagColumn.setMnemonic(KeyEvent.VK_D);
 			buttonIngressColumn.setMnemonic(KeyEvent.VK_D);
 			buttonEgressColumn.setMnemonic(KeyEvent.VK_D);
 		} else if (tableUsageIdentifier.equals("ListenersRules")) {
-			ButtonColumn buttonListenerRulesColumn = new ButtonColumn(this,
-					new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, "Whatever", "Redirect Configuration ", "Rules Actions"), 3);
+			ButtonColumn buttonListenerRulesColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, "Whatever", "Redirect Configuration ", "Rules Actions"), 3);
 			buttonListenerRulesColumn.setMnemonic(KeyEvent.VK_D);
-			ButtonColumn buttonListenerConditionsColumn = new ButtonColumn(this,
-					new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, "Whatever", "Redirect Configuration ", "Rules Conditions"), 4);
+			ButtonColumn buttonListenerConditionsColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, "Whatever", "Redirect Configuration ", "Rules Conditions"), 4);
 			buttonListenerConditionsColumn.setMnemonic(KeyEvent.VK_F);
 		} else if (tableUsageIdentifier.equals("ELBV2Listeners")) {
 			ArrayList<String> tableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.elbv2ListenerRulesTableColumnHeaders));
-			ButtonColumn buttonListenerRulesColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan,
-					tableColumnHeadersArrayList, "Target Group", "Listeners Rules ", "ListenersRules"), 5);
+			ButtonColumn buttonListenerRulesColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Target Group", "Listeners Rules ", "ListenersRules"), 5);
 			buttonListenerRulesColumn.setMnemonic(KeyEvent.VK_D);
 		} else if (tableUsageIdentifier.equals("ELBInstances")) {
-			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instances"),
-					0);
+			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instances"), 0);
 			instanceColumn.setMnemonic(KeyEvent.VK_D);
 		} else if (tableUsageIdentifier.equals("CustomEC2Instance")) {
-			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instance ID"),
-					1);
+			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instance ID"), 1);
 			instanceColumn.setMnemonic(KeyEvent.VK_D);
 		} else if (tableUsageIdentifier.equals("TargetGroupTargets")) {
-			ButtonColumn instanceColumn = new ButtonColumn(this,
-					new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instance ID"), 1);
-			instanceColumn.setMnemonic(KeyEvent.VK_D);
+			if (getColumnCount() == 5) {
+			} else {
+				ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instance ID"), 1);
+				instanceColumn.setMnemonic(KeyEvent.VK_D);
+			}
 		} else if (tableUsageIdentifier.equals("Rules Actions")) {
 			ButtonColumn tgColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Target Group"), 2);
 			tgColumn.setMnemonic(KeyEvent.VK_D);

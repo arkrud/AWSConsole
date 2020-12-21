@@ -1,6 +1,7 @@
 package com.arkrud.UI.Dashboard;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -103,7 +104,7 @@ public class Dashboard extends JFrame implements InternalFrameListener, WindowLi
 	// Get reference to JScrollableDesktopPane object
 	public JScrollableDesktopPane getJScrollableDesktopPane() {
 		if (jScrollableDesktopPane == null) {
-			jScrollableDesktopPane = new JScrollableDesktopPane(jJMenuBar);
+			jScrollableDesktopPane = new JScrollableDesktopPane(jJMenuBar);			
 		}
 		return jScrollableDesktopPane;
 	}

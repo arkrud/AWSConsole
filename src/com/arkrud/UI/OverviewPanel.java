@@ -61,7 +61,6 @@ public class OverviewPanel extends JPanel {
 			propertyNameLabels[x].setFont(new Font("Serif", Font.BOLD, 12));
 			add(propertyNameLabels[x]);
 			Object property = properties.get(x);
-			System.out.println("property: " +  property);
 			if (property != null) {
 			System.out.println("property type: " + property.getClass().getSimpleName() + "and value: " +  propertyNameLabels[x]);}
 			if (property instanceof List<?>) {
