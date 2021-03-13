@@ -1,0 +1,89 @@
+{
+	"folders": {},
+	"connections": {
+		"A254F5BA-DE01-07A8-9FBD-2D6B14A2C374-1757c3c3a0a-3837cd94a9c0cc1b": {
+			"provider": "generic",
+			"driver": "A254F5BA-DE01-07A8-9FBD-2D6B14A2C374",
+			"name": "New Connection",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"url": "jdbc:cassandra:",
+				"type": "dev",
+				"auth-model": "native",
+				"handlers": {}
+			}
+		},
+		"A254F5BA-DE01-07A8-9FBD-2D6B14A2C374-1757c403670-7f152eee9ab466": {
+			"provider": "generic",
+			"driver": "A254F5BA-DE01-07A8-9FBD-2D6B14A2C374",
+			"name": "New Connection 2",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"url": "jdbc:cassandra:",
+				"type": "dev",
+				"auth-model": "native",
+				"handlers": {}
+			}
+		}
+	},
+	"connection-types": {
+		"dev": {
+			"name": "Development",
+			"color": "255,255,255",
+			"description": "Regular development database",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": false
+		}
+	},
+	"drivers": {
+		"generic": {
+			"A254F5BA-DE01-07A8-9FBD-2D6B14A2C374": {
+				"provider": "generic",
+				"id": "A254F5BA-DE01-07A8-9FBD-2D6B14A2C374",
+				"name": "MyCass",
+				"class": "com.github.cassandra.jdbc.CassandraDriver",
+				"url": "jdbc:cassandra:",
+				"port": "9042",
+				"custom": true,
+				"embedded": false,
+				"anonymous": false,
+				"allowsEmptyPassword": false,
+				"instantiable": true,
+				"libraries": {},
+				"driver-parameters": {
+					"supports-indexes": "true",
+					"all-objects-pattern": "%",
+					"quote-reserved-words": "true",
+					"omit-schema": "false",
+					"schema-filters-enabled": "false",
+					"script-delimiter-redefiner": ";",
+					"supports-struct-cache": "true",
+					"supports-truncate": "true",
+					"omit-type-cache": "false",
+					"split-procedures-and-functions": "false",
+					"supports-stored-code": "true",
+					"supports-references": "true",
+					"omit-single-catalog": "false",
+					"ddl-drop-column-brackets": "false",
+					"omit-single-schema": "false",
+					"supports-scroll": "false",
+					"omit-catalog": "false",
+					"script-delimiter": ";",
+					"legacy-sql-dialect": "false",
+					"script-delimiter-after-query": "false",
+					"use-search-string-escape": "false",
+					"supports-multiple-results": "false",
+					"script-delimiter-after-block": "false",
+					"ddl-drop-column-short": "false",
+					"supports-limits": "true",
+					"supports-select-count": "true"
+				}
+			}
+		}
+	}
+}
