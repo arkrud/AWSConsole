@@ -165,14 +165,8 @@ public class CustomTreePopupHandler implements ActionListener, PropertyChangeLis
 			CustomTreeContainer container = ((CustomTreeContainer) node.getUserObject());
 			account = container.getAccount();
 			if (ac.equals("REFRESH")) {
-				theTree.refreshTreeNodeWithProgress(node, false, null);
+		 		theTree.refreshTreeNodeWithProgress(node, false, null);
 			} else if (ac.equals("ADD SECURITY GROUP")) {
-				//System.out.println("here it is");
-				//CustomAPIGateway.fetchApiGateways(account);
-				//CustomAPIGateway.fetchApiCustomDomains(account);
-				//CustomAPIGateway.getAPIGatewayIntegration(account,"wyfp5j7uag");
-				CustomAPIGateway.getAPIGatewayResources(account,"wyfp5j7uag");
-				
 				UtilMethodsFactory.showDialogToDesctop("AddSecurityGroupFrame", 300, 160, node, tree, dash, account, null, null, null);
 			}
 		} else {

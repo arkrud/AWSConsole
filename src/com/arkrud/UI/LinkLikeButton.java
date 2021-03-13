@@ -53,7 +53,7 @@ public class LinkLikeButton extends JButton implements ActionListener, MouseList
 		LinkLikeButton source = (LinkLikeButton) e.getSource();
 		if (source.getName().equals("TableLinkLikeButton")) {
 			if (source.getText().equals("Tags") || source.getText().equals("Ingress") || source.getText().equals("Egress") || source.getText().equals("Rules") || source.getText().equals("All Actions") || source.getText().equals("All Conditions")
-					|| source.getText().equals("Redirect") || source.getText().startsWith("i-") || source.getText().startsWith("ELBs") || source.getText().contains("targetgroup")) {
+					|| source.getText().equals("Redirect") || source.getText().startsWith("i-") || source.getText().startsWith("ELBs") || source.getText().contains("targetgroup") || source.getText().contains("Method Settings")) {
 				// Do nothing
 			} else {
 				source.getCustomAWSObject().showDetailesFrame(getAccount(), source.getCustomAWSObject(), jScrollableDesktopPan);
@@ -94,7 +94,7 @@ public class LinkLikeButton extends JButton implements ActionListener, MouseList
 		if(e.getClickCount()==1){
 		if (source.getName().equals("TableLinkLikeButton")) {
 			if (source.getText().equals("Tags") || source.getText().equals("Ingress") || source.getText().equals("Egress") || source.getText().equals("Rules") || source.getText().equals("All Actions") || source.getText().equals("All Conditions")
-					|| source.getText().equals("Redirect")  || source.getText().startsWith("ELBs") || source.getText().contains("targetgroup")) {
+					|| source.getText().equals("Redirect")  || source.getText().startsWith("ELBs") || source.getText().contains("targetgroup") || source.getText().contains("Method Settings")) {
 				// Do nothing
 			} else {
 				source.getCustomAWSObject().showDetailesFrame(getAccount(), source.getCustomAWSObject(), jScrollableDesktopPan);

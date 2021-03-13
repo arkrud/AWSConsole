@@ -5,12 +5,15 @@ import java.awt.Font;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
@@ -23,8 +26,10 @@ import com.amazonaws.services.ec2.model.VolumeAttachment;
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancingv2.model.AvailabilityZone;
 import com.arkrud.Shareware.SpringUtilities;
+import com.arkrud.UI.Dashboard.CustomTableViewInternalFrame;
 import com.arkrud.Util.UtilMethodsFactory;
 import com.arkrud.aws.AWSAccount;
+import com.arkrud.aws.CustomObjects.CustomAPIGateway;
 import com.arkrud.aws.CustomObjects.CustomAWSObject;
 import com.arkrud.aws.CustomObjects.CustomAWSSubnet;
 import com.arkrud.aws.CustomObjects.CustomEC2ELB;
@@ -34,6 +39,8 @@ import com.arkrud.aws.CustomObjects.CustomEC2NetworkInterface;
 import com.arkrud.aws.CustomObjects.CustomEC2SecurityGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2Volume;
+import com.arkrud.aws.CustomObjects.CustomLambdaFunction;
+import com.arkrud.aws.CustomObjects.CustomRESTMethod;
 import com.arkrud.aws.CustomObjects.CustomRoute53DNSRecord;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
@@ -45,6 +52,7 @@ public class OverviewPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JScrollableDesktopPane jScrollableDesktopPane;
 	private AWSAccount account;
+	private CustomTableViewInternalFrame theTableViewInternalFrame;
 
 	public OverviewPanel(Object parentPane, AWSAccount account, JScrollableDesktopPane jScrollableDesktopPane, String dataFlag) {
 		this.jScrollableDesktopPane = jScrollableDesktopPane;
@@ -61,15 +69,14 @@ public class OverviewPanel extends JPanel {
 			propertyNameLabels[x].setFont(new Font("Serif", Font.BOLD, 12));
 			add(propertyNameLabels[x]);
 			Object property = properties.get(x);
-			if (property != null) {
-			System.out.println("property type: " + property.getClass().getSimpleName() + "and value: " +  propertyNameLabels[x]);}
+			
 			if (property instanceof List<?>) {
 				if (((List<Object>) property).isEmpty()) {
 					LabelLikeTextPane labelLikeTextPane = new LabelLikeTextPane(" - ", false);
 					add(labelLikeTextPane);
 				} else {
 					if (UtilMethodsFactory.getListObjectType((List<Object>) property).contains("String")) {
-						if (propertyNameLabels[x].getText().contains("Subnet")) {
+						if (propertyNameLabels[x].getText().contains("Subnet1")) {
 							add(createButtonPanel((List<Instance>) property, "PanelLinkLikeButton", account, String.class));
 						} else {
 							add(UtilMethodsFactory.getCommaDelimitedLabel((List<String>) property));
@@ -80,6 +87,8 @@ public class OverviewPanel extends JPanel {
 						add(createButtonPanel((List<Instance>) property, "PanelLinkLikeButton", account, CustomEC2SecurityGroup.class));
 					} else if (UtilMethodsFactory.getListObjectType((List<Object>) property).contains("InstanceNetworkInterface")) {
 						add(createButtonPanel((List<Instance>) property, "PanelLinkLikeButton", account, CustomEC2NetworkInterface.class));
+					} else if (UtilMethodsFactory.getListObjectType((List<Object>) property).contains("CustomAWSSubnet")) {
+						add(createButtonPanel((List<Instance>) property, "PanelLinkLikeButton", account, CustomAWSSubnet.class));
 					} else if (UtilMethodsFactory.getListObjectType((List<Object>) property).contains("ELBInstance")) {
 						add(createButtonPanel((List<Instance>) property, "PanelLinkLikeButton", account, CustomEC2Instance.class));
 					} else if (UtilMethodsFactory.getListObjectType((List<Object>) property).equals("CustomEC2ELB")) {
@@ -94,6 +103,8 @@ public class OverviewPanel extends JPanel {
 						add(createButtonPanel((List<Instance>) property, "PanelLinkLikeButton", account, VolumeAttachment.class));
 					} else if (UtilMethodsFactory.getListObjectType((List<Object>) property).contains("AvailabilityZone")) {
 						add(createButtonPanel((List<Instance>) property, "PanelLinkLikeButton", account, AvailabilityZone.class));
+					} else if (UtilMethodsFactory.getListObjectType((List<Object>) property).contains("CustomRESTMethod")) {
+						add(createButtonPanel((List<Instance>) property, "PanelLinkLikeButton", account, CustomRESTMethod.class));
 					}
 				}
 			} else if (property instanceof CustomAWSObject) {
@@ -113,13 +124,28 @@ public class OverviewPanel extends JPanel {
 				SimpleDateFormat sdfr = new SimpleDateFormat("dd/MMM/yyyy");
 				PropertyLabel labelLikeTextPane = new PropertyLabel(sdfr.format(property));
 				add(labelLikeTextPane);
+			} else if (property instanceof HashMap) {
+				HashMap<String,String> map = (HashMap<String,String>)property;
+				JTextArea area = new JTextArea();
+				area.setEditable(false); // as before
+				area.setBackground(null); // this is the same as a JLabel
+				area.setBorder(null); // remove the border
+				area.setAlignmentX(LEFT_ALIGNMENT);
+				Font font = new Font("Courier", Font.BOLD, 12);
+				area.setFont(font);
+				area.setPreferredSize(new Dimension(200, 30));
+				for (Map.Entry<String,String> entry : map.entrySet())  
+					area.append("Variable = " + entry.getKey() + 
+	                        ", Value = " + entry.getValue() + "\n");
+				
+				add(area);
 			} else if (property instanceof Boolean) {
 				PropertyLabel labelLikeTextPane = new PropertyLabel(String.valueOf(property));
 				add(labelLikeTextPane);
 			} else {
 				boolean justLabel = true;
 				if ((String) property != null) {
-					if (propertyNameLabels[x].getText().contains("IAM Instance Profile") ) {
+					if (propertyNameLabels[x].getText().contains("IAM Instance Profile")) {
 						// || propertyNameLabels[x].getText().contains("Key Name")
 						LinkLikeButton linkLikeButton = new LinkLikeButton(property);
 						linkLikeButton.setName("PanelLinkLikeButton");
@@ -146,6 +172,8 @@ public class OverviewPanel extends JPanel {
 		CustomEC2ELB customEC2ELB;
 		CustomEC2TargetGroup customEC2TargetGroup;
 		CustomRoute53DNSRecord customRoute53DNSRecord;
+		CustomAPIGateway customAPIGateway;
+		CustomLambdaFunction customLambdaFunction;
 		switch (dataFlag) {
 		case "InstanceStorage":
 			customEC2Instance = (CustomEC2Instance) awsObject;
@@ -174,7 +202,15 @@ public class OverviewPanel extends JPanel {
 		case "DNSRecordSet Details":
 			customRoute53DNSRecord = (CustomRoute53DNSRecord) awsObject;
 			properties = customRoute53DNSRecord.getAWSDetailesPaneData();
-			break;	
+			break;
+		case "StagesAdvancedSettings":
+			customAPIGateway = (CustomAPIGateway) awsObject;
+			properties = customAPIGateway.getStagesAdvancedSettingsData();
+			break;
+		case "LambdaFunctionAdvanced":
+			customLambdaFunction = (CustomLambdaFunction) awsObject;
+			properties = customLambdaFunction.getLambdaFunctionAdvancedPaneData();
+			break;
 		default:
 			properties = ((CustomAWSObject) awsObject).getAWSDetailesPaneData();
 			break;
@@ -200,7 +236,7 @@ public class OverviewPanel extends JPanel {
 				objectIdentifier = ((CustomEC2ELB) obj).getLoadBalancerName();
 			} else if (panelObjectClass.getSimpleName().equals("CustomEC2ELBV2")) {
 				objectIdentifier = ((CustomEC2ELBV2) obj).getLoadBalancerName();
-				} else if (panelObjectClass.getName().contains("CustomEC2TargetGroup")) {
+			} else if (panelObjectClass.getName().contains("CustomEC2TargetGroup")) {
 				objectIdentifier = ((CustomEC2TargetGroup) obj).getTargetGroupName();
 			} else if (panelObjectClass.getName().contains("CustomEC2NetworkInterface")) {
 				objectIdentifier = ((InstanceNetworkInterface) obj).getNetworkInterfaceId();
@@ -221,6 +257,8 @@ public class OverviewPanel extends JPanel {
 				linkLikeButton.setCustomAWSObject(new CustomEC2Instance(account, objectIdentifier, false, null));
 			} else if (panelObjectClass.getName().contains("CustomEC2Volume")) {
 				linkLikeButton.setCustomAWSObject(new CustomEC2Volume(account, objectIdentifier));
+			} else if (panelObjectClass.getName().contains("CustomAWSSubnet")) {
+				linkLikeButton.setCustomAWSObject(new CustomAWSSubnet(account, objectIdentifier));
 			} else if (panelObjectClass.getName().contains("CustomEC2SecurityGroup")) {
 				linkLikeButton.setCustomAWSObject(new CustomEC2SecurityGroup(account, objectIdentifier, false, null));
 			} else if (panelObjectClass.getName().equals("CustomEC2ELB")) {
@@ -229,6 +267,8 @@ public class OverviewPanel extends JPanel {
 				linkLikeButton.setCustomAWSObject(new CustomEC2ELBV2(account, objectIdentifier, false, null));
 			} else if (panelObjectClass.getName().contains("CustomEC2TargetGroup")) {
 				linkLikeButton.setCustomAWSObject(new CustomEC2TargetGroup(account, objectIdentifier, false, null));
+			} else if (panelObjectClass.getName().contains("CustomRESTMethod")) {
+				//linkLikeButton.setCustomAWSObject(new CustomRESTMethod(account, objectIdentifier, false, null));
 			} else if (panelObjectClass.getName().contains("CustomEC2NetworkInterface")) {
 				linkLikeButton.setCustomAWSObject(new CustomEC2NetworkInterface(account, objectIdentifier, null));
 			} else if (panelObjectClass.getName().contains("BlockDeviceMapping")) {
@@ -256,7 +296,7 @@ public class OverviewPanel extends JPanel {
 		tf.setFont(font);
 		tf.setPreferredSize(new Dimension(200, 30));
 		JPopupMenu popup = new JPopupMenu();
-		tf.addMouseListener(new CustomTextPanePopupListener(popup,account,fieldName));
+		tf.addMouseListener(new CustomTextPanePopupListener(popup, account, fieldName));
 		add(tf);
 	}
 
@@ -271,4 +311,15 @@ public class OverviewPanel extends JPanel {
 		}
 		SpringUtilities.makeCompactGrid(this, lunchPermissions.size() + 1, 1, 10, 10, 10, 10);
 	}
+
+	public void setContainigFrame(CustomTableViewInternalFrame tableViewInternalFrame) {
+		theTableViewInternalFrame = tableViewInternalFrame;
+	}
+
+	public CustomTableViewInternalFrame getContainigFrame() {
+		return theTableViewInternalFrame;
+	}
+	
+	
+	
 }

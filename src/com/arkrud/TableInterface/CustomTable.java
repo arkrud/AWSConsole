@@ -225,7 +225,7 @@ public class CustomTable extends JTable {
 	}
 
 	private void createButtonLikeColums(JScrollableDesktopPane jScrollableDesktopPan) {
-		if (tableUsageIdentifier.equals("CustomEC2SecurityGroup") || tableUsageIdentifier.equals("ELBSecurityGroupsList")) {
+		if (tableUsageIdentifier.equals("CustomEC2SecurityGroup") || tableUsageIdentifier.equals("ELBSecurityGroupsList") ) {
 			ArrayList<String> tagsTableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.tagsTableColumnHeaders));
 			ButtonColumn buttonTagColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tagsTableColumnHeadersArrayList, "Key", "Tags ", "Tags"), 5);
 			ArrayList<String> tableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.securityGroupsRulesTableColumnHeaders));
@@ -234,6 +234,9 @@ public class CustomTable extends JTable {
 			buttonTagColumn.setMnemonic(KeyEvent.VK_D);
 			buttonIngressColumn.setMnemonic(KeyEvent.VK_D);
 			buttonEgressColumn.setMnemonic(KeyEvent.VK_D);
+		} else if (tableUsageIdentifier.equals("LambdaVPCSG")) {
+			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "SecurityGroup"), 0);
+			instanceColumn.setMnemonic(KeyEvent.VK_D);
 		} else if (tableUsageIdentifier.equals("ListenersRules")) {
 			ButtonColumn buttonListenerRulesColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, "Whatever", "Redirect Configuration ", "Rules Actions"), 3);
 			buttonListenerRulesColumn.setMnemonic(KeyEvent.VK_D);
@@ -243,7 +246,17 @@ public class CustomTable extends JTable {
 			ArrayList<String> tableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.elbv2ListenerRulesTableColumnHeaders));
 			ButtonColumn buttonListenerRulesColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Target Group", "Listeners Rules ", "ListenersRules"), 5);
 			buttonListenerRulesColumn.setMnemonic(KeyEvent.VK_D);
-		} else if (tableUsageIdentifier.equals("ELBInstances")) {
+		} else if (tableUsageIdentifier.equals("APIGatewayResources")) {
+			ArrayList<String> tableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.apiGatewayRsourceMethodsTableColumnHeaders));
+			ButtonColumn buttonAPIResourceMethodsColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Whatever", "APIGateway Method Settings ", "ResourceMethodsSettings"), 4);
+			buttonAPIResourceMethodsColumn.setMnemonic(KeyEvent.VK_D);
+		} else if (tableUsageIdentifier.equals("APIGatewayStages")) {
+			ArrayList<String> tableColumnHeadersArrayList = new ArrayList<String>(Arrays.asList(UtilMethodsFactory.apiGatewayStageMethodsTableColumnHeaders));
+			ButtonColumn buttonAPIStageMethodsColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Whatever", "APIGateway Resources Methods And Integrations ", "StagesMethodsSettings"), 4);
+			buttonAPIStageMethodsColumn.setMnemonic(KeyEvent.VK_D);
+			ButtonColumn buttonAPIStageAdvancedSettingsColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, tableColumnHeadersArrayList, "Whatever", "APIGateway Stage Detailed Settings ", "StagesAdvancedSettings"), 5);
+			buttonAPIStageAdvancedSettingsColumn.setMnemonic(KeyEvent.VK_F);
+		} else if (tableUsageIdentifier.equals("ELBInstances") ) {
 			ButtonColumn instanceColumn = new ButtonColumn(this, new CustomTableButtonColumnAction(this, jScrollableDesktopPan, null, null, null, "Instances"), 0);
 			instanceColumn.setMnemonic(KeyEvent.VK_D);
 		} else if (tableUsageIdentifier.equals("CustomEC2Instance")) {

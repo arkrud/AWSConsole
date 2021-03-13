@@ -473,7 +473,7 @@ public class CustomEC2NetworkInterface extends NetworkInterface implements Custo
 		}
 		return networkInterfaces;
 	}
-
+	
 	@Override
 	public void setAccount(AWSAccount account) {
 		this.account = account;

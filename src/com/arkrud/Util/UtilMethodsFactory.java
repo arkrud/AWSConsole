@@ -65,6 +65,7 @@ import com.arkrud.UI.SecurityGroups.AddSecurityGroupFrame;
 import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.AwsCommon;
 import com.arkrud.aws.CustomObjects.CustomAWSObject;
+import com.arkrud.aws.CustomObjects.CustomAWSSubnet;
 import com.arkrud.aws.CustomObjects.CustomEC2ELB;
 import com.arkrud.aws.CustomObjects.CustomEC2ELBV2;
 import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
@@ -84,13 +85,17 @@ public class UtilMethodsFactory {
 			"Add Security Group", "Delete Security Group", "Security Group Properties", "Create CF Stack", "Delete CF Stack", "Stack Properties", "Update CF Stack", "Create ELB", "ELB Properties", "ELBV2 Properties", "Instance Properties",
 			"Delete ELB", "AMI Properties", "Deregister AMI", "Refresh", "Create Instance", "Delete Snapshot", "Snapshot Properties", "Instance Profile Properties", "Delete Instance Profile", "IAM Role Properties", "Delete IAM Role",
 			"Delete AutoScaling Group", "AutoScaling Group Properties", "Create AutoScaling Group", "Launch Configuration Properties", "Copy Launch Configuration", "Volume Properties", "Delete Volume", "Delete KeyPair", "Add Filter", "Delete Filter",
-			"Network Interface Properties", "Delete Network Interface" , "TargetGroup Properties", "Hosted Zone Properties", "DNSRecordSet Properties" };
+			"Network Interface Properties", "Delete Network Interface", "TargetGroup Properties", "Hosted Zone Properties", "DNSRecordSet Properties", "APIGateway Settings", "CustomDomainName Settings", "VPCLink Settings", "LambdaFunction Settings", 
+			"Parameter Detailes", "Subnet Detailes", "Topic Detailes", "VPCEndpoint Detailes" };
 	public static String[] securityGroupsRulesTableColumnHeaders = { "Rule Type", "Protocol", "Port Range", "Source Type", "Range" };
 	public static String[] elbv2ListenerRulesTableColumnHeaders = { "ARN", "Default", "Priority", "Rules Actions", "Rules Conditions" };
+	public static String[] apiGatewayStageMethodsTableColumnHeaders = { "Method Path","Metrics Enabled", "Logging Level", "Throttling Burst Limit", "Throttling Rate Limit", "Caching Enabled", "Cache Ttl In Seconds", "Cache Data Encrypted", "Require Authorization For Cache Control", "Unauthorized Cache Control Header Strategy" };
+	public static String[] apiGatewayRsourceMethodsTableColumnHeaders = { "Method","Integration Type", "Integration URI" };
 	private static String[] awsAccountsTableColumnHeaders = { "Account", "aws_access_key_id", "aws_secret_access_key", "Region" };
 	public static String[] tagsTableColumnHeaders = { "Key", "Value" };
-	public static String[][] awsServicesInfo = { { "S3 Service", "Unlimited And Undistructable Storage", "s3_service" }, { "EC2 Service", "AWS Compute Service", "ec2_service" }, { "APIGateway Service", "AWS API Gateway Service", "apigateway_service" }, { "Cloud Formation", "AWS Environment Automation", "cf_service" },
-			{ "IAM", "AWS Identity and Access Management", "iam_service" }, { "Network Services", "Virtual Network Services", "net_service" } , { "Route53", "DNS Services", "dns_service" } };
+	public static String[][] awsServicesInfo = { { "S3 Service", "Unlimited And Undistructable Storage", "s3_service" }, { "EC2 Service", "AWS Compute Service", "ec2_service" },
+			{ "APIGateway Service", "AWS API Gateway Service", "apigateway_service" }, { "Cloud Formation", "AWS Environment Automation", "cf_service" }, { "IAM", "AWS Identity and Access Management", "iam_service" },
+			{ "VPC Service", "Virtual Network Services", "net_service" }, { "SNS Service", " Simple Notification Service", "sns_service" }, { "Route53", "DNS Services", "dns_service" }, { "Lambda Service", "AWS Lambda", "lambda_service" }, { "Systems Manager", "Systems Manager Service", "systems_manager" }  };
 
 	public static void addInternalFrameToScrolableDesctopPane(String frameTitle, JScrollableDesktopPane jScrollableDesktopPan, BaseInternalFrame theFrame) {
 		if (Dashboard.INTERNAL_FRAMES.get(frameTitle) == null) {
@@ -244,13 +249,11 @@ public class UtilMethodsFactory {
 							if (entry.getKey().equals(entry1.getKey()[x][y])) {
 								propertiesTabbedPane.addTableInfoPane(entry1.getKey()[x], entry1.getValue()[x], ((CustomAWSObject) nodeObject).getTableTabHeaders(entry.getKey()), ((CustomAWSObject) nodeObject).getTableTabToolTips(entry.getKey()),
 										((CustomAWSObject) nodeObject).getAssociatedImage(), n, ((CustomAWSObject) nodeObject).getkeyEvents().get(n));
-								
 							}
 							y++;
 						}
 						x++;
 					}
-					
 				}
 				propertiesTabbedPane.addResizableTabsHeights(10);
 				propertiesTabbedPane.addrResizableTabsIndex(n);
@@ -399,8 +402,8 @@ public class UtilMethodsFactory {
 				objectType = "VolumeAttachment";
 			} else if (obj instanceof AvailabilityZone) {
 				objectType = "AvailabilityZone";
-			} else if (obj instanceof Subnet) {
-				objectType = "Subnet";
+			} else if (obj instanceof CustomAWSSubnet) {
+				objectType = "CustomAWSSubnet";
 			}
 			break;
 		}
@@ -608,7 +611,7 @@ public class UtilMethodsFactory {
 		array[0] = Character.toUpperCase(array[0]);
 		return new String(array);
 	}
-	
+
 	public static void writeToFile(String outputString, String fileName, boolean writable) {
 		File fout = new File(fileName);
 		FileOutputStream fos = null;
@@ -634,4 +637,31 @@ public class UtilMethodsFactory {
 			e.printStackTrace();
 		}
 	}
+	
+	public static ArrayList<Object> addIfNotNull(ArrayList<Object> summaryData, Object property) {
+		if (property == null) {
+			summaryData.add("-");
+		} else {
+			summaryData.add(property);
+		}
+		return summaryData;
+	}
+	
+	public static String getNameTag(List<Tag> objectTags) {
+		String nameTag = "";
+		Iterator<Tag> tags = objectTags.iterator();
+		if(objectTags.size() < 1) {
+			nameTag = "-";
+		} else {
+		while (tags.hasNext()) {
+			Tag tag = tags.next();
+			if (tag.getKey().startsWith("Name")) {
+				nameTag = tag.getValue();
+			}
+		}
+		}
+		return nameTag;
+	}
 }
+
+

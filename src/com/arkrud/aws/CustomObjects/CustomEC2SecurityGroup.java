@@ -14,7 +14,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.CreateSecurityGroupRequest;
 import com.amazonaws.services.ec2.model.CreateSecurityGroupResult;
 import com.amazonaws.services.ec2.model.DeleteSecurityGroupRequest;
@@ -58,6 +61,14 @@ public class CustomEC2SecurityGroup extends SecurityGroup implements CustomAWSOb
 				this.account = account;
 			}
 		}
+	}
+
+	public CustomEC2SecurityGroup(AWSAccount account, String groupID) {
+		AmazonEC2 ec2Client = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(account.getAccountKey(), account.getAccountSecret()))).withRegion(account.getAccontRegionObject().getName())
+				.build();
+		SecurityGroup securityGroup = ec2Client.describeSecurityGroups(new DescribeSecurityGroupsRequest().withGroupIds(groupID)).getSecurityGroups().get(0);
+		this.securityGroup = new CustomEC2SecurityGroup(securityGroup);
+		this.account = account;
 	}
 
 	public CustomEC2SecurityGroup(AWSAccount account, String groupID, boolean filtered, String appFilter) {
@@ -616,4 +627,6 @@ public class CustomEC2SecurityGroup extends SecurityGroup implements CustomAWSOb
 		propertyPanelsFieldsCount.add(securityGroupOverviewHeaderLabels.length);
 		return propertyPanelsFieldsCount;
 	}
+
+	
 }

@@ -103,7 +103,6 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	}
 
 	public CustomEC2Instance() {
-		
 		super();
 	}
 
@@ -158,13 +157,13 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	@Override
 	public ArrayList<Object> getAWSDetailesPaneData() {
 		ArrayList<Object> summaryData = new ArrayList<Object>();
-		Subnet subnet = EC2Common.retriveVPCSubnets(account, getSubnetId());
+		/*Subnet subnet = EC2Common.retriveVPCSubnets(account, getSubnetId());
 		String subnetID = "";
 		if (subnet != null) {
 			subnetID = getSubnetId();
 		} else {
 			subnetID = " - ";
-		}
+		}*/
 		String vpcID = "none";
 		if (getVpcId() != null) {
 			vpcID = getVpcId();
@@ -180,7 +179,9 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 		summaryData.add(getPublicIpAddress());
 		summaryData.add(getElasicAddressess(account, getInstanceId()).get(0));
 		summaryData.add(vpcID);
-		summaryData.add(subnetID);
+		List<CustomAWSSubnet> subnets = new ArrayList<CustomAWSSubnet>();
+		subnets.add(new CustomAWSSubnet(getAccount(), getSubnetId()));
+		summaryData.add(subnets);
 		summaryData.add(getPlacement().getAvailabilityZone());
 		summaryData.add(getLaunchTime());
 		return summaryData;
@@ -668,7 +669,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 	private String getAlarmStateForInstance(AWSAccount account, String instanceId) {
 		return "Not implementted";
 	}
-	
+
 	private String getAlarmStateForInstanceSlow(AWSAccount account, String instanceId) {
 		String alarmStatValue = "No Alarms Set";
 		AmazonCloudWatchClient amazonCloudWatchClient = new AmazonCloudWatchClient(AwsCommon.getAWSCredentials(account.getAccountAlias()));
@@ -733,21 +734,21 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 						if (UtilMethodsFactory.getEC2ObjectFilterTag(instance.getTags(), "Name").matches(appFilter)) {
 							customInstance.setAccount(account);
 							instances.add(customInstance);
-							}
+						}
 					} else {
 						customInstance.setAccount(account);
 						instances.add(customInstance);
-						}
+					}
 				} else {
 					if (filtered) {
 						if (UtilMethodsFactory.getEC2ObjectFilterTag(instance.getTags(), "Name").matches(UtilMethodsFactory.getMatchString(account))) {
 							customInstance.setAccount(account);
 							instances.add(customInstance);
-							}
+						}
 					} else {
 						customInstance.setAccount(account);
 						instances.add(customInstance);
-						}
+					}
 				}
 			}
 		}
@@ -777,7 +778,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 				customInstance = new CustomEC2Instance(instance);
 				customInstance.setAccount(account);
 				instances.add(customInstance);
-				}
+			}
 		}
 		return instances;
 	}
@@ -802,7 +803,7 @@ public class CustomEC2Instance extends Instance implements CustomAWSObject {
 			while (instanceIterator.hasNext()) {
 				Instance instance = instanceIterator.next();
 				customInstance = new CustomEC2Instance(instance);
-				}
+			}
 		}
 		return customInstance;
 	}

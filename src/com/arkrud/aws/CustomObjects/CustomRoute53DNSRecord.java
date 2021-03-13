@@ -76,8 +76,8 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	private AWSAccount account;
 	private String action = "Delete";
 	private String objectNickName = "DNSRecordSet";
-	private String[] recordSetColumnHeaders = { "Record Set Name", "Type", "Value", "TTL" };
-	private JLabel[] recordSetDetailesLabels = { new JLabel("Record Set Name"), new JLabel("Name"),new JLabel("Type"), new JLabel("Value"), new JLabel("TTL") };
+	private String[] recordSetColumnHeaders = { "Record Set Name", "Value", "Type", "TTL" };
+	private JLabel[] recordSetDetailesLabels = { new JLabel("Name"),new JLabel("Type"), new JLabel("Value"), new JLabel("TTL") };
 	private JLabel[] recordSetAdvancedLabels = { new JLabel("Evaluate target Health"), new JLabel("Helth Check ID"), new JLabel("Region"), new JLabel("Weight"), new JLabel("Geolocation"), new JLabel("Multivalue Answer"), new JLabel("Set ID"), new JLabel("Failover"), new JLabel("Traffic Policy Instance Id")  };
 
 	public CustomRoute53DNSRecord() {
@@ -139,7 +139,7 @@ public class CustomRoute53DNSRecord extends ResourceRecordSet implements CustomA
 	@Override
 	public ArrayList<Object> getAWSDetailesPaneData() {
 		ArrayList<Object> summaryData = new ArrayList<Object>();
-		summaryData.add(this);
+		//summaryData.add(this);
 		summaryData.add(StringUtils.substring(getName(),0, -1));
 		summaryData.add(getType());
 		if (getResourceRecords().size() > 0 ) {

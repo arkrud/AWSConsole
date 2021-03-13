@@ -25,11 +25,18 @@ import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.S3Folder;
 import com.arkrud.aws.CustomObjects.CFStackTreeNodeUserObject;
 import com.arkrud.aws.CustomObjects.CustomAWSObject;
+import com.arkrud.aws.CustomObjects.CustomAWSSubnet;
 import com.arkrud.aws.CustomObjects.CustomEC2ELB;
 import com.arkrud.aws.CustomObjects.CustomEC2ELBV2;
 import com.arkrud.aws.CustomObjects.CustomEC2SecurityGroup;
 import com.arkrud.aws.CustomObjects.CustomEC2TargetGroup;
+import com.arkrud.aws.CustomObjects.CustomLambdaFunction;
+import com.arkrud.aws.CustomObjects.CustomParameterMetadata;
+import com.arkrud.aws.CustomObjects.CustomAPIGateway;
 import com.arkrud.aws.CustomObjects.CustomRoute53Zone;
+import com.arkrud.aws.CustomObjects.CustomSNSTopic;
+import com.arkrud.aws.CustomObjects.CustomVpcEndpoint;
+import com.arkrud.aws.CustomObjects.CustomDomainName;
 import com.arkrud.aws.StaticFactories.EC2Common;
 import com.arkrud.aws.StaticFactories.S3Common;
 
@@ -161,12 +168,47 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 			data = ((CustomEC2TargetGroup) tableObject).getTGAttributesData();
 		} else if (tableIdentifier.equals("CustomRoute53ZoneRecords")) {
 			data = ((CustomRoute53Zone) tableObject).getRoute53ZonesRecordsData(((CustomRoute53Zone) tableObject).getCustomRoute53ZoneTreeNode());
+		} else if (tableIdentifier.equals("APIGatewayResources")) {
+			data = ((CustomAPIGateway) tableObject).getAPIResources();
+		} else if (tableIdentifier.equals("APIGatewayStages")) {
+			data = ((CustomAPIGateway) tableObject).getAPIStages();
+		} else if (tableIdentifier.equals("StagesMethodsSettings")) {
+			data = ((CustomAPIGateway) tableObject).getStageMethodsData();
+		} else if (tableIdentifier.equals("ResourceMethodsSettings")) {
+			data = ((CustomAPIGateway) tableObject).getResourceMethodsData();
+		} else if (tableIdentifier.equals("CustomDomainNameMappings")) {
+			data = ((CustomDomainName) tableObject).retriveCustomDomainNameAPIMappings();
+		} else if (tableIdentifier.equals("LambdaFunctionLayers")) {
+			data = ((CustomLambdaFunction) tableObject).getLayersData();
+		} else if (tableIdentifier.equals("LambdaFunctionVPC")) {
+			data = ((CustomLambdaFunction) tableObject).getVPCSubnetsData();
+		} else if (tableIdentifier.equals("LambdaVPCSG")) {
+			data = ((CustomLambdaFunction) tableObject).getVPCSecurutyGroupsData();
+		} else if (tableIdentifier.equals("LambdaFunctionVariables")) {
+			data = ((CustomLambdaFunction) tableObject).getFunctionVariablesData();
+		} else if (tableIdentifier.equals("LambdaFunctionTriggers")) {
+			data = ((CustomLambdaFunction) tableObject).getTriggersData();
+		} else if (tableIdentifier.equals("ParameterHistory")) {
+			data = ((CustomParameterMetadata) tableObject).getParameterHistoryData();
+		} else if (tableIdentifier.equals("SubnetFlowLogs")) {
+			data = ((CustomAWSSubnet) tableObject).getSubnetFlowLogs();
+		} else if (tableIdentifier.equals("SubnetRouteTable")) {
+			data = ((CustomAWSSubnet) tableObject).getSubnetRoutes();
+		} else if (tableIdentifier.equals("TopicSubscriptions")) {
+			data = ((CustomSNSTopic) tableObject).getSNSTopicSubscriptions();
+		} else if (tableIdentifier.equals("VPCEndpointDNSNames")) {
+			data = ((CustomVpcEndpoint) tableObject).getVPCEndpointDNSNames();
+		} else if (tableIdentifier.equals("VPCEndpointSubnets")) {
+			data = ((CustomVpcEndpoint) tableObject).vpcEndpointSubnetsData();
+		} else if (tableIdentifier.equals("VPCEndpointSecurutyGroups")) {
+			data = ((CustomVpcEndpoint) tableObject).vpcEndpointSGData();
 		} else if (tableIdentifier.equals("Tags")) {
 			data = ((CustomAWSObject) tableObject).getAWSObjectTagsData();
 		} else {
 			data = EC2Common.getAWSObjectData((CustomTreeContainer) tableObject);
 		}
 	}
+	
 
 	public void generateTableHeaders(ArrayList<String> columnHeaders) {
 		Iterator<String> it = columnHeaders.iterator();
@@ -177,7 +219,7 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 
 	@Override
 	public Class<?> getColumnClass(int c) {
-
+		//System.out.println(getColumnName(c));
 		if (getColumnName(c).contains("Manage Rules") || getColumnName(c).contains("Add Instances") || getColumnName(c).contains("Add Security Groups") || getColumnName(c).contains("Add Zone") || getColumnName(c).contains("Encrypted")
 				|| getColumnName(c).contains("IP Address Type") || getColumnName(c).contains("Instance Protection") || getColumnName(c).contains("Custom Tree Visible")) {
 			return Boolean.class;
@@ -239,6 +281,10 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 			editableCellstate = true;
 		} else if (getColumnName(column).contains("Rules")) {
 			editableCellstate = true;
+		} else if (getColumnName(column).contains("Settings")) {
+			editableCellstate = true;
+		} else if (getColumnName(column).contains("Methods")) {
+			editableCellstate = true;
 		} else if (getColumnName(column).contains("Redirect")) {
 			editableCellstate = true;
 		} else if (getColumnName(column).contains("Rule Type")) {
@@ -286,6 +332,8 @@ public class CustomTableModel extends AbstractTableModel implements TableModelLi
 		} else if (getColumnName(column).contains("SSL Certificate")) {
 			editableCellstate = true;
 		} else if (getColumnName(column).contains("Custom Tree Visible")) {
+			editableCellstate = true;
+		} else if (getColumnName(column).contains("Security Group Name")) {
 			editableCellstate = true;
 		} else if (getColumnName(column).contains("Port Range")) {
 			if (isEditableTable) {

@@ -36,42 +36,7 @@ import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 public class CustomRoute53Zone extends HostedZone implements CustomAWSObject, TreeNodeState {
 	private static final long serialVersionUID = 1L;
 
-	public static ArrayList<CustomRoute53Zone> getRoute53Zones(AWSAccount account, String appFilter) {
-		ListHostedZonesRequest listHostedZonesRequest = new ListHostedZonesRequest();
-		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(account.getAccountAlias()));
-		ListHostedZonesResult result = route53.listHostedZones(listHostedZonesRequest);
-		List<HostedZone> hostedZones = result.getHostedZones();
-		ArrayList<CustomRoute53Zone> customRoute53Zones = new ArrayList<CustomRoute53Zone>();
-		/*
-		 * GetHostedZoneRequest request = new
-		 * GetHostedZoneRequest().withId("Z3M3LMPEXAMPLE"); GetHostedZoneResult response
-		 * = route53.getHostedZone(request); response.getDelegationSet();
-		 * response.getVPCs().get(0).getVPCId();
-		 */
-		Iterator<HostedZone> hostedZonesIterator = hostedZones.iterator();
-		CustomRoute53Zone customRoute53Zone = null;
-		while (hostedZonesIterator.hasNext()) {
-			HostedZone zone = hostedZonesIterator.next();
-			customRoute53Zone = new CustomRoute53Zone(zone);
-			customRoute53Zones.add(customRoute53Zone);
-		}
-		return customRoute53Zones;
-	}
-
-	public ArrayList<ArrayList<Object>> getRoute53ZonesRecordsData(DefaultMutableTreeNode customRoute53ZoneTreeNode) {
-		ArrayList<ArrayList<Object>> route53ZonesRecordsData = new ArrayList<ArrayList<Object>>();
-		int y = 0;
-		while (y < customRoute53ZoneTreeNode.getChildCount()) {
-			DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) customRoute53ZoneTreeNode.getChildAt(y);
-			CustomRoute53DNSRecord customRoute53DNSRecord = new CustomRoute53DNSRecord ((CustomRoute53DNSRecord)theNode.getUserObject());
-			route53ZonesRecordsData.add(customRoute53DNSRecord.getAWSDetailesPaneData());
-			y++;
-			
-		}
-
-
-		return route53ZonesRecordsData;
-	}
+	
 
 	private AWSAccount account;
 	private HostedZone zone;
@@ -411,4 +376,43 @@ public class CustomRoute53Zone extends HostedZone implements CustomAWSObject, Tr
 		// TODO Auto-generated method stub
 
 	}
+	
+	public static ArrayList<CustomRoute53Zone> getRoute53Zones(AWSAccount account, String appFilter) {
+		ListHostedZonesRequest listHostedZonesRequest = new ListHostedZonesRequest();
+		AmazonRoute53 route53 = new AmazonRoute53Client(AwsCommon.getAWSCredentials(account.getAccountAlias()));
+		ListHostedZonesResult result = route53.listHostedZones(listHostedZonesRequest);
+		List<HostedZone> hostedZones = result.getHostedZones();
+		ArrayList<CustomRoute53Zone> customRoute53Zones = new ArrayList<CustomRoute53Zone>();
+		/*
+		 * GetHostedZoneRequest request = new
+		 * GetHostedZoneRequest().withId("Z3M3LMPEXAMPLE"); GetHostedZoneResult response
+		 * = route53.getHostedZone(request); response.getDelegationSet();
+		 * response.getVPCs().get(0).getVPCId();
+		 */
+		Iterator<HostedZone> hostedZonesIterator = hostedZones.iterator();
+		CustomRoute53Zone customRoute53Zone = null;
+		while (hostedZonesIterator.hasNext()) {
+			HostedZone zone = hostedZonesIterator.next();
+			customRoute53Zone = new CustomRoute53Zone(zone);
+			customRoute53Zones.add(customRoute53Zone);
+		}
+		return customRoute53Zones;
+	}
+
+	public ArrayList<ArrayList<Object>> getRoute53ZonesRecordsData(DefaultMutableTreeNode customRoute53ZoneTreeNode) {
+		ArrayList<ArrayList<Object>> route53ZonesRecordsData = new ArrayList<ArrayList<Object>>();
+		int y = 0;
+		while (y < customRoute53ZoneTreeNode.getChildCount()) {
+			DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) customRoute53ZoneTreeNode.getChildAt(y);
+			CustomRoute53DNSRecord customRoute53DNSRecord = new CustomRoute53DNSRecord ((CustomRoute53DNSRecord)theNode.getUserObject());
+			route53ZonesRecordsData.add(customRoute53DNSRecord.getAWSDetailesPaneData());
+			y++;
+			
+		}
+
+
+		return route53ZonesRecordsData;
+	}
+	
+	
 }

@@ -10,8 +10,11 @@ import java.util.Vector;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.AvailabilityZone;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesRequest;
 import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
@@ -36,6 +39,13 @@ public class EC2Common {
 		AmazonEC2 ec2 = new AmazonEC2Client(credentials);
 		return ec2;
 	}
+	
+	public static AmazonEC2 connectToEC2(AWSAccount account) {
+		AmazonEC2 ec2Client = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(account.getAccountKey(), account.getAccountSecret()))).withRegion(account.getAccontRegionObject().getName())
+		.build();
+		return ec2Client;
+	}
+	
 
 	// Retrieve AWS account tags
 	public static List<com.amazonaws.services.ec2.model.TagDescription> getAccountTags(AWSAccount account) {
@@ -253,13 +263,13 @@ public class EC2Common {
 		ArrayList<ArrayList<Object>> data = new ArrayList<ArrayList<Object>>();
 		for (int i = 0; i < container.getEc2Objects().size(); i++) {
 			CustomAWSObject awsObject = (CustomAWSObject) container.getEc2Objects().get(i);
+			awsObject.setAccount(container.getAccount());
 			ArrayList<Object> awsObjectData = null;
 			if (awsObject instanceof CustomEC2Instance) {
 				awsObjectData = awsObject.getAWSObjectSummaryData();
 			} else {
 				awsObjectData = awsObject.getAWSObjectSummaryData();
 			}
-			
 			data.add(awsObjectData);
 		}
 		return data;

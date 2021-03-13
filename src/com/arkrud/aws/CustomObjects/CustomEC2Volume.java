@@ -132,7 +132,7 @@ public class CustomEC2Volume extends Volume implements CustomAWSObject {
 	@Override
 	public ArrayList<Object> getAWSDetailesPaneData() {
 		ArrayList<Object> summaryData = new ArrayList<Object>();
-		summaryData.add(getNameTag());
+		summaryData.add(UtilMethodsFactory.getNameTag(getTags()));
 		summaryData.add(getVolumeId());
 		summaryData.add(getSize());
 		summaryData.add(getVolumeType());
@@ -221,18 +221,6 @@ public class CustomEC2Volume extends Volume implements CustomAWSObject {
 		return UtilMethodsFactory.getListTabsData(tableIdentifier, tableIdentifiers, tablePaneToolTips);
 	}
 
-	private String getNameTag() {
-		String volumeName = "";
-		Iterator<Tag> tags = getTags().iterator();
-		while (tags.hasNext()) {
-			Tag tag = tags.next();
-			if (tag.getKey().startsWith("Name")) {
-				volumeName = tag.getValue();
-			}
-		}
-		return volumeName;
-	}
-
 	@Override
 	public String getObjectAWSID() {
 		return volume.getSnapshotId();
@@ -240,7 +228,7 @@ public class CustomEC2Volume extends Volume implements CustomAWSObject {
 
 	@Override
 	public String getObjectName() {
-		return getNameTag();
+		return UtilMethodsFactory.getNameTag(getTags());
 	}
 
 	@Override
@@ -301,7 +289,7 @@ public class CustomEC2Volume extends Volume implements CustomAWSObject {
 
 	@Override
 	public String getTreeNodeLeafText() {
-		return getNameTag();
+		return UtilMethodsFactory.getNameTag(getTags());
 	}
 
 	@Override

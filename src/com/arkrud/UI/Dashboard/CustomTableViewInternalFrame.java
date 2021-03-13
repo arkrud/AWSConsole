@@ -10,6 +10,7 @@ import javax.swing.event.InternalFrameListener;
 
 import com.arkrud.Shareware.StatusBar;
 import com.arkrud.TableInterface.CustomTable;
+import com.arkrud.UI.OverviewPanel;
 import com.arkrud.UI.PropertiesTabbedPane;
 import com.arkrud.UI.PropertyPanel;
 //import com.arkrud.TableInterface.CustomTable;
@@ -46,12 +47,17 @@ public class CustomTableViewInternalFrame extends BaseInternalFrame implements I
 			pane.setContainigFrame(this);
 			contentPanel.add(getPane(title, pane));
 			setSize(920, 700);
+		} else if (contents instanceof OverviewPanel) {
+			OverviewPanel pane = (OverviewPanel) contents;
+			pane.setContainigFrame(this);
+			contentPanel.add(getPane(title, pane));
+			setSize(920, 700);
 		} else if (contents instanceof PropertyPanel) {
 			PropertyPanel pane = (PropertyPanel) contents;
 			pane.setContainigFrame(this);
 			contentPanel.add(getPane(title, pane));
 			setSize(920, 700);
-		}
+		} 
 		setContentPane(contentPanel);
 		setVisible(true);
 		addInternalFrameListener(this);

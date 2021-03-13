@@ -1,7 +1,6 @@
 package com.arkrud.UI.Dashboard;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;

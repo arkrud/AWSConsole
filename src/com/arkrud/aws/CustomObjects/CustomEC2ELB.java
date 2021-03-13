@@ -176,7 +176,12 @@ public class CustomEC2ELB extends LoadBalancerDescription implements CustomAWSOb
 		summaryData.add(getDNSName());
 		summaryData.add(getScheme());
 		summaryData.add(getInstances());
-		summaryData.add(getSubnets());
+		//summaryData.add(getSubnets());
+		List<CustomAWSSubnet> subnets = new ArrayList<CustomAWSSubnet>();
+		for (int i = 0; i < getSubnets().size(); i++) {
+			subnets.add(new CustomAWSSubnet(getAccount(),getSubnets().get(i)));
+        }
+		summaryData.add(subnets);
 		summaryData.add(getAvailabilityZones());
 		summaryData.add(getCreatedTime());
 		summaryData.add(getVPCId());

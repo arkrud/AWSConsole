@@ -41,7 +41,10 @@ import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.AWSService;
 import com.arkrud.aws.AwsCommon;
 import com.arkrud.aws.CustomObjects.CFStackTreeNodeUserObject;
+import com.arkrud.aws.CustomObjects.CustomAPI;
 import com.arkrud.aws.CustomObjects.CustomAPIGateway;
+import com.arkrud.aws.CustomObjects.CustomAWSSubnet;
+import com.arkrud.aws.CustomObjects.CustomDomainName;
 import com.arkrud.aws.CustomObjects.CustomEC2AMI;
 import com.arkrud.aws.CustomObjects.CustomEC2Asg;
 import com.arkrud.aws.CustomObjects.CustomEC2ELB;
@@ -58,9 +61,14 @@ import com.arkrud.aws.CustomObjects.CustomEC2Volume;
 import com.arkrud.aws.CustomObjects.CustomELBPolicyDescription;
 import com.arkrud.aws.CustomObjects.CustomIAMInstanceProfile;
 import com.arkrud.aws.CustomObjects.CustomIAMRole;
+import com.arkrud.aws.CustomObjects.CustomLambdaFunction;
+import com.arkrud.aws.CustomObjects.CustomParameterMetadata;
 import com.arkrud.aws.CustomObjects.CustomRegionObject;
 import com.arkrud.aws.CustomObjects.CustomRoute53DNSRecord;
 import com.arkrud.aws.CustomObjects.CustomRoute53Zone;
+import com.arkrud.aws.CustomObjects.CustomSNSTopic;
+import com.arkrud.aws.CustomObjects.CustomVPCLink;
+import com.arkrud.aws.CustomObjects.CustomVpcEndpoint;
 import com.arkrud.aws.StaticFactories.S3Common;
 
 /**
@@ -81,15 +89,22 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 	private Class<?> treeContainerEC2Classes[] = { CustomEC2SecurityGroup.class, CustomEC2ELB.class, CustomEC2ELBV2.class, CustomEC2TargetGroup.class, CustomEC2KeyPair.class, CustomEC2ELBPolicyType.class, CustomEC2Instance.class, CustomEC2AMI.class,
 			CustomEC2Volume.class, CustomEC2SnapShot.class, CustomEC2Asg.class, CustomEC2LC.class, CustomEC2NetworkInterface.class };
 	private Class<?> treeContainerIAMClasses[] = { CustomIAMInstanceProfile.class };
-	private Class<?> treeContainerAPIGatewayClasses[] = { CustomAPIGateway.class };
+	private Class<?> treeContainerAPIGatewayClasses[] = { CustomAPIGateway.class, CustomDomainName.class, CustomVPCLink.class };
 	private Class<?> treeContainerRoute53Classes[] = { CustomRoute53Zone.class };
+	private Class<?> treeContainerLambdaClasses[] = { CustomLambdaFunction.class };
+	private Class<?> treeContainerSystemManagerClasses[] = { CustomParameterMetadata.class };
+	private Class<?> treeContainerVPCClasses[] = { CustomAWSSubnet.class, CustomVpcEndpoint.class };
+	private Class<?> treeContainerSNSClasses[] = { CustomSNSTopic.class };
 	public String ec2TreeContainerNames[] = { "Security Groups", "Load Balancers", "V2 Load Balancers", "Target Groups", "Key Pairs", "ELB Polices", "Instances", "AMIs", "Volumes", "Snapshots", "Autoscaling Groups", "Launch Configurations",
 			"Network Interfaces" };
 	public String iamTreeContainerNames[] = { "Instance Profiles" };
 	public String cfTreeContainerNames[] = { "Stacks" };
-	public String vpcTreeContainerNames[] = { "Subnets" };
+	public String vpcTreeContainerNames[] = { "Subnets", "VPC Endpoints" };
+	public String snsTreeContainerNames[] = { "Topics" };
 	public String route53TreeContainerNames[] = { "Zones" };
-	public String apiGatewayTreeContainerNames[] = {"APIs"}; //, "CustomDomain Names", "VPC Links" 
+	public String apiGatewayTreeContainerNames[] = {"APIs", "Custom Domain Names", "VPC Links"}; 
+	public String lambdaTreeContainerNames[] = {"Functions"}; 
+	public String parametersTreeContainerNames[] = {"Parameter Store"};
 	private DefaultMutableTreeNode top;
 	private DefaultTreeModel treeModel;
 	private JTree cloudTree;
@@ -234,6 +249,7 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 						}
 						Iterator<AWSService> awsServicesIterator = theAWSAccount.getAwsServices().iterator();
 						while (awsServicesIterator.hasNext()) {
+							
 							AWSService tehAWSService = awsServicesIterator.next();
 							tehAWSService.setAWSAccountAlias(theAWSAccount.getAccountAlias());
 							awsService = new DefaultMutableTreeNode(tehAWSService);
@@ -269,6 +285,7 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 	 */
 	@Override
 	public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
+		System.out.println(treeType);
 		if (treeType.equals("All Applications")) {
 			filter = null;
 		} else {
@@ -331,8 +348,15 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 						populateServiceAWSObjectsConfigs(theNode, accountAlias, ec2TreeContainerNames);
 					} else if (serviceName.contains("API")) {
 						populateServiceAWSObjectsConfigs(theNode, accountAlias, apiGatewayTreeContainerNames);
+					} else if (serviceName.contains("Lambda")) {
+						populateServiceAWSObjectsConfigs(theNode, accountAlias, lambdaTreeContainerNames);
+					} else if (serviceName.contains("Systems Manager")) {
+						populateServiceAWSObjectsConfigs(theNode, accountAlias, parametersTreeContainerNames);
 					} else if (serviceName.contains("Cloud Formation")) {
-					} else if (serviceName.contains("Network Services")) {
+					} else if (serviceName.contains("VPC")) {
+						populateServiceAWSObjectsConfigs(theNode, accountAlias, vpcTreeContainerNames);
+					} else if (serviceName.contains("SNS")) {
+						populateServiceAWSObjectsConfigs(theNode, accountAlias, snsTreeContainerNames);
 					} else if (serviceName.contains("Route53")) {
 						populateServiceAWSObjectsConfigs(theNode, accountAlias, route53TreeContainerNames);
 					} else if (serviceName.contains("IAM")) {
@@ -389,8 +413,16 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 						populateS3Nodes(theNode);
 					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("EC2")) {
 						populateEC2Nodes(theNode, appFilter);
+					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("Lambda")) {
+						populateNodes(theNode, appFilter, treeContainerLambdaClasses, lambdaTreeContainerNames);
+					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("Systems Manager")) {
+					    populateNodes(theNode, appFilter, treeContainerSystemManagerClasses, parametersTreeContainerNames);
+					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("VPC")) {
+					    populateNodes(theNode, appFilter, treeContainerVPCClasses, vpcTreeContainerNames);
+					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("SNS")) {
+					    populateNodes(theNode, appFilter, treeContainerSNSClasses, snsTreeContainerNames);
 					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("API")) {
-						populateAPIGatewayNodes(theNode, appFilter);
+						populateNodes(theNode, appFilter, treeContainerAPIGatewayClasses, apiGatewayTreeContainerNames);
 					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().contains("Cloud Formation")) {
 						CustomTreeContainer container = new CustomTreeContainer();
 						DefaultMutableTreeNode cfStackContainerNode = new DefaultMutableTreeNode(container);
@@ -403,7 +435,7 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 						populateIAMNodes(theNode, appFilter);
 					} else if (((AWSService) theNode.getUserObject()).getAwsServiceName().equals("Route53")) {
 						populateRout53Nodes(theNode, appFilter);
-					}
+					} 
 				}
 			}
 		}
@@ -460,14 +492,17 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 		}
 	}
 	
+	
+	
+	
 	/**
 	 * Populate AWS EC2 service data<br>
 	 */
-	private void populateAPIGatewayNodes(DefaultMutableTreeNode apiGatewayNode, String appFilter) {
-		AWSAccount awsAccount = ((AWSService) apiGatewayNode.getUserObject()).getTheAccount();
+	private void populateNodes(DefaultMutableTreeNode treeNode, String appFilter, Class<?>[] treeContainerClasses, String[] treeContainerNames) {
+		AWSAccount awsAccount = ((AWSService) treeNode.getUserObject()).getTheAccount();
 		LinkedHashMap<Class<?>, String> objectsMap = new LinkedHashMap<Class<?>, String>();
-		for (int i = 0; i < treeContainerAPIGatewayClasses.length; i++) {
-			objectsMap.put(treeContainerAPIGatewayClasses[i], apiGatewayTreeContainerNames[i]);
+		for (int i = 0; i < treeContainerClasses.length; i++) {
+			objectsMap.put(treeContainerClasses[i], treeContainerNames[i]);
 		}
 		for (Class<?> key : objectsMap.keySet()) {
 			if (Boolean.valueOf(INIFilesFactory.getItemValueFromINI(UtilMethodsFactory.getConsoleConfig(), awsAccount.getAccountAlias(), objectsMap.get(key)))) {
@@ -475,16 +510,18 @@ public class CustomTree extends JPanel implements TreeWillExpandListener, TreeSe
 				container.setAccount(awsAccount);
 				container.setChildObject(key);
 				container.setContainerName(objectsMap.get(key));
-				DefaultMutableTreeNode apiGatewayContainerNode = new DefaultMutableTreeNode(container);
-				apiGatewayNode.add(apiGatewayContainerNode);
+				DefaultMutableTreeNode containerNode = new DefaultMutableTreeNode(container);
+				treeNode.add(containerNode);
 				try {
-					populateContainerObjects(apiGatewayContainerNode, appFilter);
+					populateContainerObjects(containerNode, appFilter);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
 	}
+	
+	
 
 	/**
 	 * Populate AWS EC2 ELB Policies. <br>

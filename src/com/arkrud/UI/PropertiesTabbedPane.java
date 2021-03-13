@@ -30,8 +30,12 @@ import com.arkrud.UI.Dashboard.CustomTableViewInternalFrame;
 import com.arkrud.Util.UtilMethodsFactory;
 import com.arkrud.aws.AWSAccount;
 import com.arkrud.aws.CustomObjects.CFStackTreeNodeUserObject;
+import com.arkrud.aws.CustomObjects.CustomAPIGateway;
 import com.arkrud.aws.CustomObjects.CustomEC2LC;
 import com.arkrud.aws.CustomObjects.CustomIAMRole;
+import com.arkrud.aws.CustomObjects.CustomLambdaFunction;
+import com.arkrud.aws.CustomObjects.CustomSNSTopic;
+import com.arkrud.aws.CustomObjects.CustomVpcEndpoint;
 import com.tomtessier.scrollabledesktop.JScrollableDesktopPane;
 
 public class PropertiesTabbedPane extends JPanel {
@@ -80,7 +84,7 @@ public class PropertiesTabbedPane extends JPanel {
 						int tabIndex = resizableTabsIndex.get(y);
 						if (tabbedPane.getSelectedIndex() == tabIndex) {
 							if (tabNeedResize.get(y)) {
-								tabbedPane.setPreferredSize(new Dimension(1, resizableTabsHeights.get(y) * 40));
+								tabbedPane.setPreferredSize(new Dimension(1, resizableTabsHeights.get(y) * 50));
 							}
 						}
 						y++;
@@ -92,8 +96,7 @@ public class PropertiesTabbedPane extends JPanel {
 		// tabbedPane.setMnemonicAt(tabIndex, mnemonic);
 	}
 
-	public void addTableInfoPane(String[] dataFlags, String[][] tagsColumnHeadersArray, String paneTitle, String paneTip, ImageIcon icon, int tabIndex,
-			int mnemonic) {
+	public void addTableInfoPane(String[] dataFlags, String[][] tagsColumnHeadersArray, String paneTitle, String paneTip, ImageIcon icon, int tabIndex, int mnemonic) {
 		JPanel instancesAndSubnetsPanel = new JPanel(new SpringLayout());
 		int x = 0;
 		while (x < dataFlags.length) {
@@ -118,29 +121,78 @@ public class PropertiesTabbedPane extends JPanel {
 		((AbstractDocument) textPane.getDocument()).setDocumentFilter(new CustomDocumentFilter(textPane));
 		try {
 			if (dataFlag.equals("StackTemplate")) {
-				doc.insertString(doc.getLength(),
-						CFStackTreeNodeUserObject.getStacksTemplate(account, ((CFStackTreeNodeUserObject) userObject).getStack().getStackName()), style);
+				doc.insertString(doc.getLength(), CFStackTreeNodeUserObject.getStacksTemplate(account, ((CFStackTreeNodeUserObject) userObject).getStack().getStackName()), style);
 			} else if (dataFlag.equals("RolePolicyDocument")) {
 				try {
-					doc.insertString(doc.getLength(),
-							java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(((CustomIAMRole) userObject).getAssumeRolePolicyDocument()), "UTF-8"),
-							style);
+					doc.insertString(doc.getLength(), java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(((CustomIAMRole) userObject).getAssumeRolePolicyDocument()), "UTF-8"), style);
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();
 				}
 			} else if (dataFlag.contains("RolePolicy")) {
-				List<String> rolePolices = CustomIAMRole.getIAMRolePolices(((CustomIAMRole) userObject).getAccount().getAccountAlias(),
-						((CustomIAMRole) userObject).getRoleName());
+				List<String> rolePolices = CustomIAMRole.getIAMRolePolices(((CustomIAMRole) userObject).getAccount().getAccountAlias(), ((CustomIAMRole) userObject).getRoleName());
 				int x = 0;
 				while (x < rolePolices.size()) {
-					String policy = CustomIAMRole.getIAMRolePolicyDocument(rolePolices.get(x), ((CustomIAMRole) userObject).getRoleName(),
-							((CustomIAMRole) userObject).getAccount().getAccountAlias());
+					String policy = CustomIAMRole.getIAMRolePolicyDocument(rolePolices.get(x), ((CustomIAMRole) userObject).getRoleName(), ((CustomIAMRole) userObject).getAccount().getAccountAlias());
 					try {
 						doc.insertString(doc.getLength(), java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(policy), "UTF-8"), style);
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
 					}
 					x++;
+				}
+			} else if (dataFlag.contains("ResourcePolicy")) {
+				String policy = ((CustomAPIGateway) userObject).getPolicy();
+				if (policy != null) {
+					try {
+						doc.insertString(doc.getLength(), java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(((CustomAPIGateway) userObject).getPolicy().replace("\\", "")), "UTF-8"), style);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (dataFlag.contains("ResourceBasedPolicy")) {
+				String policy = ((CustomLambdaFunction) userObject).getPolicy();
+				if (policy != null) {
+					try {
+						doc.insertString(doc.getLength(), java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(((CustomLambdaFunction) userObject).getPolicy().replace("\\", "")), "UTF-8"), style);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (dataFlag.contains("IAMRole")) {
+				String policy = ((CustomLambdaFunction) userObject).getRolePolicyDocumentText();
+				if (policy != null) {
+					try {
+						doc.insertString(doc.getLength(), java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(((CustomLambdaFunction) userObject).getRolePolicyDocumentText().replace("\\", "")), "UTF-8"), style);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (dataFlag.contains("SNSTopicAccessPolicy")) {
+				String policy = ((CustomSNSTopic) userObject).getSNSTopicAccessPolicy();
+				if (policy != null) {
+					try {
+						doc.insertString(doc.getLength(), java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(((CustomSNSTopic) userObject).getSNSTopicAccessPolicy().replace("\\", "")), "UTF-8"), style);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (dataFlag.contains("SNSTopicEffectiveDeliveryPolicy")) {
+				String policy = ((CustomSNSTopic) userObject).getSNSTopicEffectiveDeliveryPolicy();
+				if (policy != null) {
+					try {
+						doc.insertString(doc.getLength(), java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(((CustomSNSTopic) userObject).getSNSTopicEffectiveDeliveryPolicy().replace("\\", "")), "UTF-8"), style);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (dataFlag.contains("VPCEndpointPolicy")) {
+				String policy = ((CustomVpcEndpoint) userObject).getPolicyDocument();
+				if (policy != null) {
+					try {
+						doc.insertString(doc.getLength(), java.net.URLDecoder.decode(UtilMethodsFactory.formatJSON(((CustomVpcEndpoint) userObject).getPolicyDocument().replace("\\", "")), "UTF-8"), style);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
 				}
 			} else if (dataFlag.contains("LCUserData")) {
 				byte[] valueDecoded = Base64.decodeBase64(((CustomEC2LC) userObject).getUserData());
@@ -150,13 +202,13 @@ public class PropertiesTabbedPane extends JPanel {
 			e.printStackTrace();
 		}
 		JScrollPane docScrollPane = new JScrollPane(textPane);
-		//docScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		// docScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		docScrollPane.setMinimumSize(textPane.getPreferredSize());
 		docPanel.add(docScrollPane);
 		tabbedPane.addTab(paneTitle, icon, docPanel, paneTip);
 		tabbedPane.setMnemonicAt(tabIndex, mnemonic);
 	}
-	
+
 	public void setPaneSelection(int index) {
 		tabbedPane.setSelectedIndex(index);
 	}
